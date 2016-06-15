@@ -9,7 +9,7 @@ npm install --save redux-form-saga
 
 ## Why do I need this?
 
-If you are using Redux Saga and have tried to get Redux Form to play along, then you likely know it doesn't quite work. This provides a solution using an action creator `createFormAction(requestAction, SUCCESS, FAILURE)` and a saga `formActionSaga`.
+If you are using Redux Saga and have tried to get Redux Form to play along, then you likely know it doesn't quite work. This provides a solution using an action creator `createFormAction('REQUEST')` and a saga `formActionSaga`.
 
 ## Installation
 
@@ -22,6 +22,27 @@ Then, to enable Redux Form Saga, add `formActionSaga` in your `sagaMiddleware.ru
 ## Usage
 
 Any form you create using Redux Form can receive an action creator (i.e. `requestAction`) as a parameter to `handleSubmit`.
+
+```javascript
+import { createAction } from 'redux-actions';
+import { createFormAction } from 'redux-form-saga';
+
+const typePrefix = 'FORM';
+const formAction = createFormAction(typePrefix);
+
+// formAction.REQUEST == 'FORM_REQUEST';
+// formAction.SUCCESS == 'FORM_SUCCESS';
+// formAction.FAILURE == 'FORM_FAILURE';
+// formAction.request(payload) == { type: 'FORM_REQUEST', payload };
+// formAction.success(payload) == { type: 'FORM_SUCCESS', payload };
+// formAction.failure(payload) == { type: 'FORM_FAILURE', payload };
+
+<form onSubmit={handleSubmit(formAction)}>
+// ...
+</form>
+```
+
+or long form
 
 ```javascript
 import { createAction } from 'redux-actions';

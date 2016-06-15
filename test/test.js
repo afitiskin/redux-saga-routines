@@ -2,49 +2,63 @@ import { PROMISE, createFormAction, formActionSaga } from '../lib';
 import { take, race, put, call } from 'redux-saga/effects';
 import { expect } from 'chai';
 
-const REQUEST = 'REQUEST';
-const SUCCESS = 'SUCCESS';
-const FAILURE = 'FAILURE';
+const PREFIX = 'PREFIX';
+const REQUEST = `${PREFIX}_REQUEST`;
+const SUCCESS = `${PREFIX}_SUCCESS`;
+const FAILURE = `${PREFIX}_FAILURE`;
 
 describe('redux-form-saga', () => {
   describe('createFormAction', () => {
     let formAction, action, dispatch, payload, thunk, promise;
-    beforeEach(() => {
-      formAction = createFormAction(mockCreateLoginRequest, [SUCCESS, FAILURE]);
+    let beforeFn = () => {
       dispatch = (a) => { action = a };
       payload = { mock: 'payload' };
       thunk = formAction(payload);
       promise = thunk(dispatch);
-    });
-    it('should create a thunkd action', () => {
-      expect(formAction).to.be.a('function');
-      expect(formAction({})).to.be.a('function');
-    });
+    };
 
-    it('should dispatch an action with the correct structure', () => {
-      expect(action.payload).to.have.keys(['defer', 'request', 'types']);
-      expect(action.payload.defer).to.have.keys(['reject', 'resolve']);
-      expect(action.payload.request).to.have.keys(['payload', 'type']);
-      expect(action.payload.types).to.be.an('array');
-    });
+    ['default', 'short'].forEach(function(type) {
+      describe(`with the ${type} implementation`, function() {
+        beforeEach(() => {
+          if (type === 'default') {
+            formAction = createFormAction(mockCreateLoginRequest, [SUCCESS, FAILURE]);
+          } else {
+            formAction = createFormAction(PREFIX);
+          }
+          beforeFn();
+        })
 
-    it('should dispatch an action with a defer with reject, resolve fns', () => {
-      expect(action.payload.defer.reject).to.be.a('function');
-      expect(action.payload.defer.resolve).to.be.a('function');
-    });
+        it('should create a thunkd action', () => {
+          expect(formAction).to.be.a('function');
+          expect(formAction({})).to.be.a('function');
+        });
 
-    it('should dispatch an action with the correct request action', () => {
-      expect(action.payload.request.payload).to.equal(payload);
-      expect(action.payload.request.type).to.equal(REQUEST);
-    });
+        it('should dispatch an action with the correct structure', () => {
+          expect(action.payload).to.have.keys(['defer', 'request', 'types']);
+          expect(action.payload.defer).to.have.keys(['reject', 'resolve']);
+          expect(action.payload.request).to.have.keys(['payload', 'type']);
+          expect(action.payload.types).to.be.an('array');
+        });
 
-    it('should dispatch an action with the correct types', () => {
-      expect(action.payload.types[0]).to.equal(SUCCESS);
-      expect(action.payload.types[1]).to.equal(FAILURE);
-    });
+        it('should dispatch an action with a defer with reject, resolve fns', () => {
+          expect(action.payload.defer.reject).to.be.a('function');
+          expect(action.payload.defer.resolve).to.be.a('function');
+        });
 
-    it('should return a promise', () => {
-      expect(promise).to.be.a('promise');
+        it('should dispatch an action with the correct request action', () => {
+          expect(action.payload.request.payload).to.deep.equal(payload);
+          expect(action.payload.request.type).to.equal(REQUEST);
+        });
+
+        it('should dispatch an action with the correct types', () => {
+          expect(action.payload.types[0]).to.equal(SUCCESS);
+          expect(action.payload.types[1]).to.equal(FAILURE);
+        });
+
+        it('should return a promise', () => {
+          expect(promise).to.be.a('promise');
+        });
+      });
     });
   });
 
