@@ -36,10 +36,6 @@
     "redux-saga": "^0.10.5"
   },
   "peerDependencies": {
-    "react": "*",
-    "redux": "*",
-    "react-redux": "*",
-    "redux-thunk": "*",
     "redux-saga": "*",
     "redux-form": "*"
   },

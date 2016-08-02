@@ -19,6 +19,8 @@ npm i --save redux-form-saga
 
 Then, to enable Redux Form Saga, add `formActionSaga` in your `sagaMiddleware.run()`.
 
+**Important!** If the browser you are targeting doesn't support *ES2015 promises*, you must provide a valid polyfill, such as [the one provided by `babel`](https://cdnjs.cloudflare.com/ajax/libs/babel-polyfill/6.9.1/polyfill.js).
+
 ## Usage
 
 Any form you create using Redux Form can receive an action creator (i.e. `requestAction`) as a parameter to `handleSubmit`.

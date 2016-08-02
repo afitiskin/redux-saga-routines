@@ -1,4 +1,3 @@
-import 'babel-polyfill';
 import { take, race, put, call } from 'redux-saga/effects';
 
 const identity = i => i;
