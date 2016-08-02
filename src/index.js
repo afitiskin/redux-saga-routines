@@ -9,7 +9,7 @@ function createFormAction (requestAction, types, payloadCreator = identity) {
   const actionMethods = {};
   const formAction = (payload) => ({
     type: PROMISE,
-    payload: payloadCreator(payload)
+    payload
   });
 
   // Allow a type prefix to be passed in
@@ -18,7 +18,7 @@ function createFormAction (requestAction, types, payloadCreator = identity) {
       let a = `${requestAction}_${s}`;
       let subAction = payload => ({
         type: a,
-        payload
+        payload: payloadCreator(payload)
       });
 
       // translate specific actionType to generic actionType

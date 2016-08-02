@@ -1,3 +1,4 @@
+import 'babel-polyfill';
 import { PROMISE, createFormAction, formActionSaga } from '../lib';
 import { take, race, put, call } from 'redux-saga/effects';
 import { expect } from 'chai';
@@ -9,21 +10,26 @@ const FAILURE = `${PREFIX}_FAILURE`;
 
 describe('redux-form-saga', () => {
   describe('createFormAction', () => {
-    let formAction, action, dispatch, payload, thunk, promise;
+    let formAction, action, dispatch, payload, thunk, promise, payloadCreator;
     let beforeFn = () => {
       dispatch = (a) => { action = a };
       payload = { mock: 'payload' };
       thunk = formAction(payload);
       promise = thunk(dispatch);
+      payloadCreator = key => ({ key });
     };
 
     ['default', 'short'].forEach(function(type) {
       describe(`with the ${type} implementation`, function() {
         beforeEach(() => {
           if (type === 'default') {
-            formAction = createFormAction(mockCreateLoginRequest, [SUCCESS, FAILURE]);
+            formAction = createFormAction(
+              mockCreateLoginRequest,
+              [SUCCESS, FAILURE],
+              payloadCreator
+            );
           } else {
-            formAction = createFormAction(PREFIX);
+            formAction = createFormAction(PREFIX, payloadCreator);
           }
           beforeFn();
         })
