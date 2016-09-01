@@ -2,6 +2,7 @@ import 'babel-polyfill';
 import { PROMISE, createFormAction, formActionSaga } from '../lib';
 import { take, race, put, call } from 'redux-saga/effects';
 import { expect } from 'chai';
+import { isFSA } from 'flux-standard-action';
 
 const PREFIX = 'PREFIX';
 const REQUEST = `${PREFIX}_REQUEST`;
@@ -32,6 +33,15 @@ describe('redux-form-saga', () => {
           }
           beforeFn();
         })
+
+        it('should return a promise', () => {
+          expect(formAction).to.be.a('function');
+          expect(formAction({}).then).to.be.a('function');
+        });
+
+        it('should dispatch an FSA compient action', () => {
+          expect(isFSA(action)).to.equal(true);
+        });
 
         it('should dispatch an action with the correct structure', () => {
           expect(action.payload).to.have.keys(['defer', 'request', 'types']);

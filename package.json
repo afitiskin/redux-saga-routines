@@ -13,9 +13,6 @@
     "submit"
   ],
   "main": "lib/index.js",
-  "dependencies": {
-    "flux-standard-action": "^0.6.0"
-  },
   "devDependencies": {
     "babel-cli": "^6.4.5",
     "babel-polyfill": "^6.9.1",
@@ -27,6 +24,7 @@
     "eslint": "^2.4.0",
     "eslint-plugin-babel": "^3.0.0",
     "eslint-plugin-react": "^5.0.0",
+    "flux-standard-action": "^0.6.0",
     "mocha": "^2.3.4",
     "react": "^0.14.6",
     "react-dom": "^0.14.6",
