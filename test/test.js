@@ -10,12 +10,11 @@ const FAILURE = `${PREFIX}_FAILURE`;
 
 describe('redux-form-saga', () => {
   describe('createFormAction', () => {
-    let formAction, action, dispatch, payload, thunk, promise, payloadCreator;
+    let formAction, action, dispatch, payload, promise, payloadCreator;
     let beforeFn = () => {
       dispatch = (a) => { action = a };
       payload = { mock: 'payload' };
-      thunk = formAction(payload);
-      promise = thunk(dispatch);
+      promise = formAction(payload, dispatch);
       payloadCreator = key => ({ key });
     };
 
@@ -33,11 +32,6 @@ describe('redux-form-saga', () => {
           }
           beforeFn();
         })
-
-        it('should create a thunkd action', () => {
-          expect(formAction).to.be.a('function');
-          expect(formAction({})).to.be.a('function');
-        });
 
         it('should dispatch an action with the correct structure', () => {
           expect(action.payload).to.have.keys(['defer', 'request', 'types']);
