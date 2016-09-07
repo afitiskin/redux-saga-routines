@@ -4,3 +4,4 @@ node_modules
 src/
 example/
 tests/
+test/

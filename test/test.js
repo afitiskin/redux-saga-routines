@@ -11,26 +11,27 @@ const FAILURE = `${PREFIX}_FAILURE`;
 
 describe('redux-form-saga', () => {
   describe('createFormAction', () => {
-    let formAction, action, dispatch, payload, promise, payloadCreator;
-    let beforeFn = () => {
-      dispatch = (a) => { action = a };
-      payload = { mock: 'payload' };
-      promise = formAction(payload, dispatch);
-      payloadCreator = key => ({ key });
-    };
-
     ['default', 'short'].forEach(function(type) {
+      let formAction, action, dispatch, payload, promise, payloadCreator;
+      let beforeFn = () => {
+        dispatch = (a) => { action = a };
+        payload = { mock: 'payload' };
+        promise = formAction(payload, dispatch);
+        payloadCreator = key => ({ key });
+      };
+
       describe(`with the ${type} implementation`, function() {
         beforeEach(() => {
           if (type === 'default') {
             formAction = createFormAction(
-              mockCreateLoginRequest,
+              mockCreateLoginRequest(payloadCreator),
               [SUCCESS, FAILURE],
               payloadCreator
             );
           } else {
             formAction = createFormAction(PREFIX, payloadCreator);
           }
+
           beforeFn();
         })
 
@@ -56,7 +57,7 @@ describe('redux-form-saga', () => {
         });
 
         it('should dispatch an action with the correct request action', () => {
-          expect(action.payload.request.payload).to.deep.equal(payload);
+          expect(action.payload.request.payload).to.deep.equal({ key: payload });
           expect(action.payload.request.type).to.equal(REQUEST);
         });
 
@@ -135,9 +136,10 @@ describe('redux-form-saga', () => {
   });
 });
 
-function mockCreateLoginRequest(data) {
-  return {
+function mockCreateLoginRequest(creator) {
+  creator = creator || (ident => ident);
+  return (data) => ({
     type: REQUEST,
-    payload: data
-  }
+    payload: creator(data)
+  })
 }

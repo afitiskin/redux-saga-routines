@@ -24,7 +24,7 @@ function createFormAction (requestAction, types, payloadCreator = identity) {
       actionMethods[s] = a;
       actionMethods[s.toLowerCase()] = subAction;
 
-      return a;
+      return subAction;
     })[0];
 
     if (types) {
