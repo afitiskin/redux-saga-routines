@@ -1,6 +1,6 @@
 {
   "name": "redux-form-saga",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "An action creator and saga for integrating Redux Form and Redux Saga",
   "keywords": [
     "redux-form",

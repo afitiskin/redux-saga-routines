@@ -1,6 +1,7 @@
 import 'babel-polyfill';
-import { PROMISE, createFormAction, formActionSaga } from '../lib';
-import { take, race, put, call } from 'redux-saga/effects';
+import { PROMISE, createFormAction, formActionWatcher, handlePromiseSaga, parseResponseSaga } from '../lib';
+import { takeEvery } from 'redux-saga';
+import { take, race, put, call, fork } from 'redux-saga/effects';
 import { expect } from 'chai';
 import { isFSA } from 'flux-standard-action';
 
@@ -74,65 +75,83 @@ describe('redux-form-saga', () => {
   });
 
   describe('formActionSaga', () => {
-    let iterator, action, defer, request, types;
+    let action, defer, request, types;
 
     beforeEach(() => {
-      iterator = formActionSaga();
-      defer = {
-        resolve: () => {},
-        reject: () => {}
-      };
       request = {
         type: REQUEST,
-        payload: {}
+        payload: {},
+      };
+      defer = {
+        resolve: () => {},
+        reject: () => {},
       };
       types = [ SUCCESS, FAILURE ];
+
       action = {
         type: PROMISE,
         payload: {
           defer,
           request,
           types
-        }
+        },
       };
     });
 
-    it('with a successful run it should yield with a TAKE of type FAILURE', () => {
-      run({ success: 'A success' });
+    describe('formActionWather', () => {
+      it('should take every PROMISE action and run handlePromise iterator', function () {
+        const iterator = formActionWatcher();
+
+        expect(iterator.next().value).to.deep.equal(
+          call(takeEvery, PROMISE, handlePromiseSaga)
+        );
+      });
     });
 
-    it('with a failed run it should yield with a TAKE of type FAILURE', () => {
-      run({ fail: 'A failure!' });
+    describe('handlePromiseSaga', () => {
+      it('should properly handle promise action', () => {
+        const iterator = handlePromiseSaga(action);
+
+        expect(iterator.next().value).to.deep.equal(
+          fork(parseResponseSaga, { defer, types })
+        );
+        expect(iterator.next().value).to.deep.equal(
+          put(request)
+        );
+      });
     });
 
-    function run(winner) {
-      expect(iterator.next().value).to.deep.equal(
-        take(PROMISE)
-      );
+    describe('parseResponseSaga', () => {
+      let iterator;
 
-      expect(iterator.next(action).value).to.deep.equal(
-        put(request)
-      );
+      beforeEach(() => {
+        iterator = parseResponseSaga({ defer, types});
+      });
 
-      expect(iterator.next().value).to.deep.equal(
-        race({ success: take(SUCCESS), fail: take(FAILURE) })
-      );
+      it('with a successful run it should yield with a TAKE of type FAILURE', () => {
+        run({ success: 'A success' });
+      });
 
-      if (winner.success) {
-        expect(iterator.next(winner).value).to.deep.equal(
-          call(defer.resolve, winner.success)
+      it('with a failed run it should yield with a TAKE of type FAILURE', () => {
+        run({ fail: 'A failure!' });
+      });
+
+      function run(winner) {
+        expect(iterator.next().value).to.deep.equal(
+          race({ success: take(SUCCESS), fail: take(FAILURE) })
         );
-      } else {
-        expect(iterator.next(winner).value).to.deep.equal(
-          call(defer.reject, winner.fail)
-        );
+
+        if (winner.success) {
+          expect(iterator.next(winner).value).to.deep.equal(
+            call(defer.resolve, winner.success)
+          );
+        } else {
+          expect(iterator.next(winner).value).to.deep.equal(
+            call(defer.reject, winner.fail)
+          );
+        }
       }
-
-      expect(iterator.next().value).to.deep.equal(
-        take(PROMISE)
-      );
-    }
-
+    });
   });
 });
 
