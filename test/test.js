@@ -1,7 +1,7 @@
 import 'babel-polyfill';
 import { PROMISE, createFormAction, formActionSaga, handlePromiseSaga } from '../lib';
 import { takeEvery } from 'redux-saga';
-import { take, race, put, call, fork } from 'redux-saga/effects';
+import { take, race, put, call } from 'redux-saga/effects';
 import { expect } from 'chai';
 import { isFSA } from 'flux-standard-action';
 

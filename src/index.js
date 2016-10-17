@@ -1,5 +1,5 @@
 import { takeEvery } from 'redux-saga';
-import { take, race, put, call, fork } from 'redux-saga/effects';
+import { take, race, put, call } from 'redux-saga/effects';
 
 const identity = i => i;
 const PROMISE = '@@redux-form-saga/PROMISE';
