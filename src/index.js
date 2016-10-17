@@ -50,14 +50,18 @@ function createFormAction (requestAction, types, payloadCreator = identity) {
   }, actionMethods);
 };
 
-function *parseResponseSaga({ defer, types }) {
+function *handlePromiseSaga({ payload }) {
+  const { request, defer, types } = payload;
   const { resolve, reject } = defer;
   const [ SUCCESS, FAIL ] = types;
 
-  const winner = yield race({
-    success: take(SUCCESS),
-    fail: take(FAIL),
-  });
+  const [ winner ] = yield [
+    race({
+      success: take(SUCCESS),
+      fail: take(FAIL),
+    }),
+    put(request),
+  ];
 
   if (winner.success) {
     yield call(resolve, winner.success);
@@ -66,23 +70,15 @@ function *parseResponseSaga({ defer, types }) {
   }
 }
 
-function *handlePromiseSaga({ payload }) {
-  const { request, defer, types } = payload;
-
-  yield fork(parseResponseSaga, { defer, types });
-  yield put(request);
-}
-
-function *formActionWatcher() {
+function *formActionSaga() {
   yield call(takeEvery, PROMISE, handlePromiseSaga);
 }
 
 export {
   PROMISE,
   createFormAction,
-  formActionWatcher,
+  formActionSaga,
   handlePromiseSaga,
-  parseResponseSaga,
 }
 
-export default formActionWatcher;
+export default formActionSaga;
