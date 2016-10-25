@@ -81,3 +81,9 @@ export function* actionsWatcherSaga() {
 }
 
 export default actionsWatcherSaga;
+
+// add backward compatibility with redux-form-saga >=0.0.7:
+export const PROMISE = PROMISE_ACTION;
+export const createFormAction = createAction;
+export const formActionSaga = actionsWatcherSaga;
+export const handlePromiseSaga = handleActionSaga;

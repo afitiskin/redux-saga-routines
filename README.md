@@ -72,6 +72,17 @@ yield put(action.failure(new SubmissionError(response.error)));
 ```
 
 
+## Migration from `redux-form-saga`:
+
+This package is 100% compatible with `redux-form-saga@0.0.7`, so feel free to use it:
+```javascript
+// you can either use old constants and function names:
+import { PROMISE, createFormAction, formActionSaga } from 'redux-form-saga';
+
+// or new if you want:
+import { PROMISE_ACTION, createAction, actionWatcherSaga } from 'redux-form-saga';
+```
+
 ## Scripts
 
 ```

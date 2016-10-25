@@ -1,5 +1,6 @@
 import 'babel-polyfill';
 import { PROMISE_ACTION, createAction, actionsWatcherSaga, handleActionSaga } from '../src';
+import { PROMISE, createFormAction, formActionSaga, handlePromiseSaga } from '../src';
 import { takeEvery } from 'redux-saga';
 import { take, race, put, call } from 'redux-saga/effects';
 import { describe, beforeEach, it } from 'mocha';
@@ -139,6 +140,15 @@ describe('redux-saga-actions', () => {
 
         expect(iterator.next([winner]).value).to.deep.equal(result);
       }
+    });
+  });
+
+  describe('compatibility', () => {
+    it('should be compatible with redux-form-saga >= 0.0.7', () => {
+      expect(PROMISE).to.equal(PROMISE_ACTION);
+      expect(createFormAction).to.equal(createAction);
+      expect(formActionSaga).to.equal(actionsWatcherSaga);
+      expect(handlePromiseSaga).to.equal(handleActionSaga);
     });
   });
 });
