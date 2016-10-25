@@ -1,7 +1,8 @@
 import 'babel-polyfill';
-import { PROMISE, createFormAction, formActionSaga, handlePromiseSaga } from '../lib';
+import { PROMISE_ACTION, createAction, actionsWatcherSaga, handleActionSaga } from '../src';
 import { takeEvery } from 'redux-saga';
 import { take, race, put, call } from 'redux-saga/effects';
+import { describe, beforeEach, it } from 'mocha';
 import { expect } from 'chai';
 import { isFSA } from 'flux-standard-action';
 
@@ -10,8 +11,8 @@ const REQUEST = `${PREFIX}_REQUEST`;
 const SUCCESS = `${PREFIX}_SUCCESS`;
 const FAILURE = `${PREFIX}_FAILURE`;
 
-describe('redux-form-saga', () => {
-  describe('createFormAction', () => {
+describe('redux-saga-actions', () => {
+  describe('createAction', () => {
     ['default', 'short'].forEach(function(type) {
       let formAction, action, dispatch, payload, promise, payloadCreator;
       let beforeFn = () => {
@@ -24,17 +25,17 @@ describe('redux-form-saga', () => {
       describe(`with the ${type} implementation`, function() {
         beforeEach(() => {
           if (type === 'default') {
-            formAction = createFormAction(
+            formAction = createAction(
               mockCreateLoginRequest(payloadCreator),
               [SUCCESS, FAILURE],
               payloadCreator
             );
           } else {
-            formAction = createFormAction(PREFIX, payloadCreator);
+            formAction = createAction(PREFIX, payloadCreator);
           }
 
           beforeFn();
-        })
+        });
 
         it('should return a promise', () => {
           expect(formAction).to.be.a('function');
@@ -74,7 +75,7 @@ describe('redux-form-saga', () => {
     });
   });
 
-  describe('formActionSaga', () => {
+  describe('actionsWatcherSaga', () => {
     let action, defer, request, types;
 
     beforeEach(() => {
@@ -89,29 +90,29 @@ describe('redux-form-saga', () => {
       types = [ SUCCESS, FAILURE ];
 
       action = {
-        type: PROMISE,
+        type: PROMISE_ACTION,
         payload: {
           defer,
           request,
-          types
+          types,
         },
       };
     });
 
-    it('should take every PROMISE action and run handlePromise iterator', function () {
-      const iterator = formActionSaga();
+    it('should take every PROMISE_ACTION action and run handleActionSaga iterator', function () {
+      const iterator = actionsWatcherSaga();
 
       expect(iterator.next().value).to.deep.equal(
-        call(takeEvery, PROMISE, handlePromiseSaga)
+        call(takeEvery, PROMISE_ACTION, handleActionSaga)
       );
-      expect(iterator.next().done).to.be.true;
+      expect(iterator.next().done).to.equal(true);
     });
 
-    describe('handlePromiseSaga', () => {
+    describe('handleActionSaga', () => {
       let iterator;
 
       beforeEach(() => {
-        iterator = handlePromiseSaga(action);
+        iterator = handleActionSaga(action);
       });
 
       it('with a successful run it should yield with a TAKE of type FAILURE', () => {
@@ -119,33 +120,33 @@ describe('redux-form-saga', () => {
       });
 
       it('with a failed run it should yield with a TAKE of type FAILURE', () => {
-        run({ fail: 'A failure!' });
+        run({ failure: 'A failure!' });
       });
-      
+
+      it('with a failed run it should yield with a TAKE of type FAILURE', () => {
+        run({ failure: { payload: 'failure payload!' } });
+      });
+
       function run(winner) {
         expect(iterator.next().value).to.deep.equal([
-          race({ success: take(SUCCESS), fail: take(FAILURE) }),
+          race({ success: take(SUCCESS), failure: take(FAILURE) }),
           put(request),
         ]);
 
-        if (winner.success) {
-          expect(iterator.next([winner]).value).to.deep.equal(
-              call(defer.resolve, winner.success)
-          );
-        } else {
-          expect(iterator.next([winner]).value).to.deep.equal(
-              call(defer.reject, winner.fail)
-          );
-        }
+        const successResult = winner.success;
+        const failureResult = winner.failure && winner.failure.payload ? winner.failure.payload : winner.failure;
+        const result = winner.success ? call(defer.resolve, successResult) : call(defer.reject, failureResult);
+
+        expect(iterator.next([winner]).value).to.deep.equal(result);
       }
     });
   });
 });
 
 function mockCreateLoginRequest(creator) {
-  creator = creator || (ident => ident);
+  creator = creator || (payload => payload);
   return (data) => ({
     type: REQUEST,
-    payload: creator(data)
+    payload: creator(data),
   })
 }

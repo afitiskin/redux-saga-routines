@@ -1,7 +1,7 @@
-.idea
-.DS_Store
 node_modules
-src/
-example/
-tests/
-test/
+test
+.babelrc
+.editorconfig
+.eslintrc
+.gitignore
+.travis.yml

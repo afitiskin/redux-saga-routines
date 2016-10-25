@@ -1,23 +1,19 @@
-# redux-form-saga
-Connecting [Redux Form](https://github.com/erikras/redux-form) and [Redux Saga](https://github.com/yelouafi/redux-saga) through a saga.
+# redux-saga-actions
+An action creator for [Redux Saga](https://github.com/yelouafi/redux-saga) compatible with [Redux Form](https://github.com/erikras/redux-form). Forked from [redux-form-saga](https://github.com/mhssmnn/redux-form-saga)
 
-[![Build Status](https://travis-ci.org/mhssmnn/redux-form-saga.svg)](https://travis-ci.org/mhssmnn/redux-form-saga) [![npm version](https://badge.fury.io/js/redux-form-saga.svg)](http://badge.fury.io/js/redux-form-saga)
 
-```javascript
-npm install --save redux-form-saga
-```
 
 ## Why do I need this?
 
-If you are using Redux Saga and have tried to get Redux Form to play along, then you likely know it doesn't quite work. This provides a solution using an action creator `createFormAction('REQUEST')` and a saga `formActionSaga`.
+Reduce boilerplate from your source code when making requests to API or validate forms build on top of Redux Form.
 
 ## Installation
 
 ```javascript
-npm i --save redux-form-saga
+npm install --save redux-saga-actions
 ```
 
-Then, to enable Redux Form Saga, add `formActionSaga` in your `sagaMiddleware.run()`.
+Then, to enable redux-saga-actions, add `actionsWatcherSaga` in your `sagaMiddleware.run()`.
 
 **Important!** If the browser you are targeting doesn't support *ES2015 promises*, you must provide a valid polyfill, such as [the one provided by `babel`](https://cdnjs.cloudflare.com/ajax/libs/babel-polyfill/6.9.1/polyfill.js).
 
@@ -26,75 +22,58 @@ Then, to enable Redux Form Saga, add `formActionSaga` in your `sagaMiddleware.ru
 Any form you create using Redux Form can receive an action creator (i.e. `requestAction`) as a parameter to `handleSubmit`.
 
 ```javascript
-import { createAction } from 'redux-actions';
-import { createFormAction } from 'redux-form-saga';
+import { createAction } from 'redux-saga-actions';
 
-const typePrefix = 'FORM';
-const formAction = createFormAction(typePrefix);
+// create action
+const action = createFormAction('FETCH_DATA');
 
-// formAction.REQUEST == 'FORM_REQUEST';
-// formAction.SUCCESS == 'FORM_SUCCESS';
-// formAction.FAILURE == 'FORM_FAILURE';
-// formAction.request(payload) == { type: 'FORM_REQUEST', payload };
-// formAction.success(payload) == { type: 'FORM_SUCCESS', payload };
-// formAction.failure(payload) == { type: 'FORM_FAILURE', payload };
+// now your action is a function
+// action == (payload, dispatch) => Promise
 
-<form onSubmit={handleSubmit(formAction)}>
-// ...
-</form>
-```
+// also, you have access to action types constants:
+// action.REQUEST == 'FETCH_DATA_REQUEST';
+// action.SUCCESS == 'FETCH_DATA_SUCCESS';
+// action.FAILURE == 'FETCH_DATA_FAILURE';
 
-or long form
+// and to direct dispatching of sub actions
+// action.request(payload) == { type: 'FETCH_DATA_REQUEST', payload };
+// action.success(payload) == { type: 'FETCH_DATA_SUCCESS', payload };
+// action.failure(payload) == { type: 'FETCH_DATA_FAILURE', payload };
 
-```javascript
-import { createAction } from 'redux-actions';
-import { createFormAction } from 'redux-form-saga';
 
-const REQUEST = 'REQUEST';
-const SUCCESS = 'SUCCESS';
-const FAILURE = 'FAILURE';
+// when you need to dispatch action:
+action(payload, dispatch);
 
-const requestAction = createAction(REQUEST);
-const successAction = createAction(SUCCESS);
-const failureAction = createAction(FAILURE);
-
-const formAction = createFormAction(requestAction, [SUCCESS, FAILURE]);
-
-// ...
-
-<form onSubmit={handleSubmit(formAction)}>
-// ...
-</form>
-```
-
-Now you can create a saga to handle the request, success and failure flow and this will be sent back to the form component.
-
-For example, a login form saga:
-
-```javascript
-import { push } from 'react-router-redux';
-import { take, put, call } from 'redux-saga/effects';
-import { auth } from '...';
-import { LOGIN_REQUEST, loginSuccess, loginFailure } from '...';
-
-/**
- * Authentication saga
- */
-export function *loginFlow () {
-  while (true) {
-    let request = yield take(LOGIN_REQUEST);
-    let user = ({ username, password } = request.payload);
-    let token;
-
-    try {
-      token = yield call(auth.login, { user });
-      yield put(loginSuccess(token));
-    } catch (error) {
-      yield put(loginFailure(error));
-    }
+// all you need now is to handle action.REQUEST action in your own saga to initialize request to API and perform API request
+// for example it could be done like this:
+function handleRequest() {
+  try {
+    // perform request to '/some_url' to fetch some data
+    const response = yield call(apiClient.request, '/some_url');
+    // if request successfully finished
+    yield put(action.success(response.data));
+  } catch (error) {
+    // if request failed
+    yield put(action.failure(response.error));
   }
 }
+
+function* handleRequestSaga() {
+  yield takeEvery(action.REQUEST, handleRequest)
+}
 ```
+
+
+Result of `action(payload, dispatch)` is a Promise, so you can directly pass this function to Redux Form's `handleSubmit` to perform async validation:
+```javascript
+<form onSubmit={handleSubmit(action)}>...</form>
+```
+
+To properly handle form error you have to pass to `action.failure` instance of `SubmissionError`:
+```javascript
+yield put(action.failure(new SubmissionError(response.error)));
+```
+
 
 ## Scripts
 
