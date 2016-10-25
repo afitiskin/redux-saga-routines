@@ -1,11 +1,9 @@
 # redux-saga-actions
 An action creator for [Redux Saga](https://github.com/yelouafi/redux-saga) compatible with [Redux Form](https://github.com/erikras/redux-form). Forked from [redux-form-saga](https://github.com/mhssmnn/redux-form-saga)
 
-
-
 ## Why do I need this?
 
-Reduce boilerplate from your source code when making requests to API or validate forms build on top of Redux Form.
+Reduce boilerplate from your source code when making requests to API or validating forms build on top of [Redux Form](https://github.com/erikras/redux-form).
 
 ## Installation
 
@@ -13,12 +11,16 @@ Reduce boilerplate from your source code when making requests to API or validate
 npm install --save redux-saga-actions
 ```
 
-Then, to enable redux-saga-actions, add `actionsWatcherSaga` in your `sagaMiddleware.run()`.
-
-**Important!** If the browser you are targeting doesn't support *ES2015 promises*, you must provide a valid polyfill, such as [the one provided by `babel`](https://cdnjs.cloudflare.com/ajax/libs/babel-polyfill/6.9.1/polyfill.js).
+**Important!** `redux-saga-actions` uses native *ES2015 Promises*, if the browser you are targeting doesn't support ES2015 Promises, you habe provide a valid polyfill, such as [the one provided by `babel`](https://cdnjs.cloudflare.com/ajax/libs/babel-polyfill/6.9.1/polyfill.js).
 
 ## Usage
+First of all to enable `redux-saga-actions`, you have to add `actionsWatcherSaga` in your `sagaMiddleware.run()`, for example like this:
+```javascript
+const sagas = [yourFirstSaga, yourOtherSaga, ..., actionsWatcherSaga];
+sagas.map(sagaMiddleware.run);
+```
 
+Then, use `createAction` to in your code:
 ```javascript
 import { createAction } from 'redux-saga-actions';
 
@@ -77,10 +79,10 @@ yield put(action.failure(new SubmissionError(response.error)));
 This package is 100% compatible with `redux-form-saga@0.0.7`, so feel free to use it:
 ```javascript
 // you can either use old constants and function names:
-import { PROMISE, createFormAction, formActionSaga } from 'redux-form-saga';
+import { PROMISE, createFormAction, formActionSaga } from 'redux-saga-actions';
 
 // or new if you want:
-import { PROMISE_ACTION, createAction, actionWatcherSaga } from 'redux-form-saga';
+import { PROMISE_ACTION, createAction, actionWatcherSaga } from 'redux-saga-actions';
 ```
 
 ## Scripts

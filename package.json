@@ -1,6 +1,6 @@
 {
   "name": "redux-saga-actions",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "An action creator for Redux Saga compatible with Redux Form. Forked from mhssmnn/redux-form-saga",
   "keywords": [
     "redux",
