@@ -1,6 +1,6 @@
 {
   "name": "redux-saga-actions",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "An action creator for Redux Saga compatible with Redux Form. Forked from mhssmnn/redux-form-saga",
   "keywords": [
     "redux",
@@ -33,7 +33,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:mhssmnn/redux-form-saga.git"
+    "url": "git@github.com:afitiskin/redux-saga-actions.git"
   },
   "author": {
     "name": "Alex Fitiskin",
