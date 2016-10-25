@@ -19,33 +19,30 @@ Then, to enable redux-saga-actions, add `actionsWatcherSaga` in your `sagaMiddle
 
 ## Usage
 
-Any form you create using Redux Form can receive an action creator (i.e. `requestAction`) as a parameter to `handleSubmit`.
-
 ```javascript
 import { createAction } from 'redux-saga-actions';
 
 // create action
-const action = createFormAction('FETCH_DATA');
+const action = createAction('FETCH_DATA');
 
-// now your action is a function
+// now your action is a function that returns promise (useful for Redux Form users)
 // action == (payload, dispatch) => Promise
 
-// also, you have access to action types constants:
+// also, you have access to sub action types constants:
 // action.REQUEST == 'FETCH_DATA_REQUEST';
 // action.SUCCESS == 'FETCH_DATA_SUCCESS';
 // action.FAILURE == 'FETCH_DATA_FAILURE';
 
-// and to direct dispatching of sub actions
+// and to of sub actions creators:
 // action.request(payload) == { type: 'FETCH_DATA_REQUEST', payload };
 // action.success(payload) == { type: 'FETCH_DATA_SUCCESS', payload };
 // action.failure(payload) == { type: 'FETCH_DATA_FAILURE', payload };
 
 
-// when you need to dispatch action:
+// when you want to initialize data fetching, you need only to call action:
 action(payload, dispatch);
 
-// all you need now is to handle action.REQUEST action in your own saga to initialize request to API and perform API request
-// for example it could be done like this:
+// then, you need to handle action.REQUEST action in your own saga to perform API request:
 function handleRequest() {
   try {
     // perform request to '/some_url' to fetch some data
@@ -69,7 +66,7 @@ Result of `action(payload, dispatch)` is a Promise, so you can directly pass thi
 <form onSubmit={handleSubmit(action)}>...</form>
 ```
 
-To properly handle form error you have to pass to `action.failure` instance of `SubmissionError`:
+To properly handle form errors you have to pass to `action.failure` instance of `SubmissionError`:
 ```javascript
 yield put(action.failure(new SubmissionError(response.error)));
 ```
