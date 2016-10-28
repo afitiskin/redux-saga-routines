@@ -1,6 +1,6 @@
 {
   "name": "redux-saga-actions",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "An action creator for Redux Saga compatible with Redux Form. Forked from mhssmnn/redux-form-saga",
   "keywords": [
     "redux",
@@ -12,7 +12,6 @@
     "redux-form"
   ],
   "main": "lib/index.js",
-  "jsnext:main": "src/index.js",
   "devDependencies": {
     "babel-cli": "^6.4.5",
     "babel-eslint": "^6.1.2",
