@@ -70,7 +70,7 @@ export function* handleActionSaga({ payload }) {
   ];
 
   if (success) {
-    yield call(resolve, success);
+    yield call(resolve);
   } else {
     yield call(reject, failure && failure.payload ? failure.payload : failure);
   }
