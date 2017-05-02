@@ -35,20 +35,17 @@ describe('handlePromiseAction saga', () => {
   });
 
   const run = (winner) => {
-    // check if trigger action raised
-    expect(iterator.next().value).to.deep.equal(put(routine.trigger()));
     // check if race between SUCCESS and FAILURE started
     // check if request action raised
     expect(iterator.next().value).to.deep.equal([
       race({ success: take(routine.SUCCESS), failure: take(routine.FAILURE) }),
-      put(routine.request(data)),
+      put(routine.trigger(data)),
     ]);
 
-    const result = winner.success ? call(resolve) : call(reject, winner.failure.payload || winner.failure);
+    const getPayload = (data) => (data && data.payload) || data;
+    const result = winner.success ? call(resolve) : call(reject, getPayload(winner.failure));
     // check if promise resolve / reject called
     expect(iterator.next([winner]).value).to.deep.equal(result);
-    // check if fulfill action raised
-    expect(iterator.next().value).to.deep.equal(put(routine.fulfill()));
     // check if saga done
     expect(iterator.next().done).to.equal(true);
   };
