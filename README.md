@@ -11,7 +11,7 @@ Reduce boilerplate from your source code when making requests to API or validati
 yarn add redux-saga-routines
 ```
 
-**Important!** `redux-saga-routines` uses native *ES2015 Promises*, if the browser you are targeting doesn't support ES2015 Promises, you habe provide a valid polyfill, such as [the one provided by `babel`](https://cdnjs.cloudflare.com/ajax/libs/babel-polyfill/6.9.1/polyfill.js).
+**Important!** `redux-saga-routines` uses native *ES2015 Promises*, if the browser you are targeting doesn't support ES2015 Promises, you have provide a valid polyfill, such as [the one provided by `babel`](https://cdnjs.cloudflare.com/ajax/libs/babel-polyfill/6.9.1/polyfill.js).
 
 ## What is routine?
 Routine is a smart action creator that encapsulates 5 action types and 5 action creators to make standard actions lifecycle easy-to-use:
