@@ -7,8 +7,6 @@ import routinesWatcherSaga, { handlePromiseAction } from '../src/routinesWatcher
 import { PROMISE_ACTION } from '../src/constants';
 import createRoutine from '../src/createRoutine';
 
-const noop = () => undefined;
-
 describe('routinesWatcherSaga', () => {
   it('take every promise action and run promise handler', () => {
     const iterator = routinesWatcherSaga();

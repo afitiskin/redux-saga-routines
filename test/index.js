@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-expressions */
 import 'babel-polyfill';
 import { describe, it } from 'mocha';
 import { expect } from 'chai';
