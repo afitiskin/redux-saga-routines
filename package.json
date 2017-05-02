@@ -1,17 +1,16 @@
 {
-  "name": "redux-saga-actions",
-  "version": "1.0.5",
-  "description": "An action creator for Redux Saga compatible with Redux Form. Forked from mhssmnn/redux-form-saga",
+  "name": "redux-saga-routines",
+  "version": "1.0.0",
+  "description": "Routines for redux-saga also useful with redux-form",
   "keywords": [
     "redux",
     "saga",
     "redux-saga",
-    "actions",
-    "redux-actions",
-    "redux-saga-actions",
+    "routines",
+    "redux-saga-routines",
     "redux-form"
   ],
-  "main": "lib/index.js",
+  "main": "dist/index.js",
   "devDependencies": {
     "babel-cli": "^6.4.5",
     "babel-eslint": "^6.1.2",
@@ -24,15 +23,16 @@
     "eslint-plugin-babel": "^3.0.0",
     "flux-standard-action": "^0.6.0",
     "mocha": "^2.3.4",
-    "redux-saga": "^0.10.5",
-    "rimraf": "^2.5.4"
+    "redux-saga": "^0.14.0",
+    "rimraf": "^2.5.4",
+    "sinon": "^2.1.0"
   },
   "peerDependencies": {
-    "redux-saga": ">=0.8.2"
+    "redux-saga": ">=0.14.0"
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:afitiskin/redux-saga-actions.git"
+    "url": "git@github.com:afitiskin/redux-saga-routines.git"
   },
   "author": {
     "name": "Alex Fitiskin",
@@ -55,14 +55,14 @@
     }
   ],
   "bugs": {
-    "url": "https://github.com/afitiskin/redux-saga-actions/issues"
+    "url": "https://github.com/afitiskin/redux-saga-routines/issues"
   },
   "scripts": {
     "lint": "eslint ./{src,test}/**/*.{js,jsx}",
-    "test": "./node_modules/.bin/mocha --compilers js:babel-register test",
+    "test": "mocha --compilers js:babel-register test",
     "test:watch": "npm run test -- --watch",
     "prebuild": "npm run test && npm run lint && rimraf lib",
-    "build": "NODE_ENV=production babel src/ --out-dir lib/",
+    "build": "NODE_ENV=production babel src/ --out-dir dist",
     "prepublish": "npm run build"
   },
   "license": "MIT"
