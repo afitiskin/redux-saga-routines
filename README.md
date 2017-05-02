@@ -20,7 +20,7 @@ TRIGGER -> REQUEST -> SUCCESS / FAILURE -> FULFILL
 So, with `redux-saga-routines` you don't need to create all these action type constants and action creators manually, just use `createRoutine`:
 
 ```javascript
-import { createRotine } from 'redux-saga-routines';
+import { createRoutine } from 'redux-saga-routines';
 
 // creating routine
 const routine = createRoutine('PREFIX');
@@ -78,7 +78,7 @@ Let's start with creating routine for fetching some data from server:
 ```javascript
 // routines.js
 
-import { createRotine } from 'redux-saga-routines';
+import { createRoutine } from 'redux-saga-routines';
 export const fetchData = createRoutine('FETCH_DATA');
 ```
 
