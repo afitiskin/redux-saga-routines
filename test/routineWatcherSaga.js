@@ -1,4 +1,3 @@
-import 'babel-polyfill';
 import { describe, it } from 'mocha';
 import { expect } from 'chai';
 import { takeEvery, take, race, put, call } from 'redux-saga/effects';
