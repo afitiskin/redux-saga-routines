@@ -181,7 +181,7 @@ function fetchDataFromServer() {
     yield put(fetchData.success(response.data));
   } catch (error) {
     // if request failed
-    yield put(fetchData.failure(response.error));
+    yield put(fetchData.failure(error.message));
   } finally {
     // trigger fulfill action
     yield put(fetchData.fulfill());
@@ -223,7 +223,7 @@ function* fetchDataFromServer() {
     yield put(fetchData.success(response.data));
   } catch (error) {
     // if request failed
-    yield put(fetchData.failure(response.error));
+    yield put(fetchData.failure(error.message));
   }
 }
 ```
@@ -299,7 +299,7 @@ function* sendFormDataToServer(formData) {
     yield put(submitMyForm.success(response.data));
   } catch (error) {
     // if request failed
-    yield put(submitMyForm.failure(response.error));
+    yield put(submitMyForm.failure(new SubmissionError({ _error: error.message })));
   }  
 }
 ```
