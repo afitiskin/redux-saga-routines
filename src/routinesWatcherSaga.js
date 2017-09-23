@@ -1,4 +1,4 @@
-import { takeEvery, take, race, put, call } from 'redux-saga/effects';
+import { takeEvery, take, race, put, call, all } from 'redux-saga/effects';
 import { PROMISE_ACTION } from './constants'
 
 const getPayload = (data) => (data && data.payload) || data;
@@ -6,13 +6,17 @@ const getPayload = (data) => (data && data.payload) || data;
 export function* handlePromiseAction(action) {
   const { data, params, defer: { resolve, reject } } = action.payload;
 
-  const [ { success, failure } ] = yield [
+  const effects = [
     race({
       success: take(params.SUCCESS),
       failure: take(params.FAILURE),
     }),
     put(params.trigger(data)),
   ];
+
+  const allEffects = all([...effects]).ALL;
+
+  const [ {success, failure} ] = yield allEffects;
 
   if (success) {
     yield call(resolve);
