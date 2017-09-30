@@ -11,6 +11,7 @@
     "redux-form"
   ],
   "main": "dist/index.js",
+  "types": "src/index.d.ts",
   "module": "es/index.js",
   "jsnext:main": "es/index.js",
   "devDependencies": {
@@ -72,6 +73,7 @@
   },
   "license": "MIT",
   "dependencies": {
+    "@types/redux-actions": "^2.2.2",
     "redux-actions": "^2.2.1"
   }
 }
