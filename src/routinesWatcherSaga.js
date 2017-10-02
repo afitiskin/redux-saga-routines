@@ -13,15 +13,7 @@ export function* handlePromiseAction(action) {
     }),
     put(params.trigger(data)),
   ]);
-
-  // const [ { success, failure } ] = yield all([
-  //   race({
-  //     success: take(params.SUCCESS),
-  //     failure: take(params.FAILURE),
-  //   }),
-  //   put(params.trigger(data)),
-  // ]);
-
+  
   if (success) {
     yield call(resolve);
   } else {
