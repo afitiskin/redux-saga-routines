@@ -6,17 +6,21 @@ const getPayload = (data) => (data && data.payload) || data;
 export function* handlePromiseAction(action) {
   const { data, params, defer: { resolve, reject } } = action.payload;
 
-  const effects = [
+  const [ {success, failure} ] = yield all([
     race({
       success: take(params.SUCCESS),
       failure: take(params.FAILURE),
     }),
     put(params.trigger(data)),
-  ];
+  ]);
 
-  const allEffects = all([...effects]).ALL;
-
-  const [ {success, failure} ] = yield allEffects;
+  // const [ { success, failure } ] = yield all([
+  //   race({
+  //     success: take(params.SUCCESS),
+  //     failure: take(params.FAILURE),
+  //   }),
+  //   put(params.trigger(data)),
+  // ]);
 
   if (success) {
     yield call(resolve);
