@@ -1,6 +1,6 @@
 import { describe, it } from 'mocha';
 import { expect } from 'chai';
-import { takeEvery, take, race, put, call } from 'redux-saga/effects';
+import { takeEvery, take, race, put, call, all } from 'redux-saga/effects';
 
 import routinesWatcherSaga, { handlePromiseAction } from '../src/routinesWatcherSaga';
 import { PROMISE_ACTION } from '../src/constants';
@@ -34,10 +34,10 @@ describe('handlePromiseAction saga', () => {
   const run = (winner) => {
     // check if race between SUCCESS and FAILURE started
     // check if request action raised
-    expect(iterator.next().value).to.deep.equal([
+    expect(iterator.next().value).to.deep.equal(all([
       race({ success: take(routine.SUCCESS), failure: take(routine.FAILURE) }),
       put(routine.trigger(data)),
-    ]);
+    ]));
 
     const getPayload = (data) => (data && data.payload) || data;
     const result = winner.success ? call(resolve) : call(reject, getPayload(winner.failure));
