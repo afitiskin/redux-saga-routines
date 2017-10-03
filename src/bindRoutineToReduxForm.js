@@ -8,6 +8,7 @@ export default function bindRoutineToReduxForm(routine) {
       props,
       routine,
       defer: { resolve, reject },
+      reduxFormCompatible: true,
     },
   }));
 }

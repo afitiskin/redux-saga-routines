@@ -1,8 +1,10 @@
 import { takeEvery, take, race, put, call, all } from 'redux-saga/effects';
 import { ROUTINE_PROMISE_ACTION } from './constants'
 
+const getPayload = (data) => (data && data.payload) || data;
+
 export function* handleRoutinePromiseAction(action) {
-  const { values, props, routine, defer: { resolve, reject } } = action.payload;
+  const { values, props, routine, defer: { resolve, reject }, reduxFormCompatible } = action.payload;
 
   const [ {success, failure} ] = yield all([
     race({
@@ -13,9 +15,9 @@ export function* handleRoutinePromiseAction(action) {
   ]);
 
   if (success) {
-    yield call(resolve);
+    yield reduxFormCompatible ? call(resolve) : call(resolve, getPayload(success));
   } else {
-    yield call(reject, (failure && failure.payload) || failure);
+    yield call(reject, getPayload(failure));
   }
 }
 

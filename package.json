@@ -1,6 +1,6 @@
 {
   "name": "redux-saga-routines",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Routines for redux-saga also useful with redux-form",
   "keywords": [
     "redux",

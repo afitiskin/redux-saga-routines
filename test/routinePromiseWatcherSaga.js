@@ -34,15 +34,7 @@ describe('handleRoutinePromiseAction saga', () => {
   let resolve;
   let reject;
 
-  beforeEach(() => {
-    rfHandler(values, (action) => {
-      iterator = handleRoutinePromiseAction(action);
-      resolve = action.payload.defer.resolve;
-      reject = action.payload.defer.reject;
-    }, props);
-  });
-
-  const run = (winner) => {
+  const run = (winner, reduxFormCompatible = false) => {
     // check if race between SUCCESS and FAILURE started
     // check if request action raised
     expect(iterator.next().value).to.deep.equal(all([
@@ -51,22 +43,77 @@ describe('handleRoutinePromiseAction saga', () => {
     ]));
 
     const getPayload = (data) => (data && data.payload) || data;
-    const result = winner.success ? call(resolve) : call(reject, getPayload(winner.failure));
+    let result;
+    if (winner.success) {
+      result = reduxFormCompatible ? call(resolve) : call(resolve, getPayload(winner.success));
+    } else {
+      result = call(reject, getPayload(winner.failure));
+    }
+
     // check if promise resolve / reject called
     expect(iterator.next([winner]).value).to.deep.equal(result);
     // check if saga done
     expect(iterator.next().done).to.equal(true);
   };
 
-  it('resolves promise if got SUCCESS action', () => {
-    run({ success: true });
+  describe('default version', () => {
+    beforeEach(() => {
+      resolve = () => 'resolve';
+      reject = () => 'reject';
+
+      const action = {
+        type: ROUTINE_PROMISE_ACTION,
+        payload: {
+          values,
+          props,
+          routine,
+          defer: { resolve, reject },
+        },
+      };
+
+      iterator = handleRoutinePromiseAction(action);
+    });
+
+    it('resolves promise if got SUCCESS action', () => {
+      run({ success: true });
+    });
+
+    it('resolves promise with payload if got SUCCESS action and payload provided', () => {
+      run({ success: { payload: 'success payload' } });
+    });
+
+    it('rejects promise with failure if got FAILURE action and no payload provided', () => {
+      run({ failure: true });
+    });
+
+    it('rejects promise with payload if got FAILURE action and payload provided', () => {
+      run({ failure: { payload: 'failure payload' } });
+    });
   });
 
-  it('rejects promise with failure if got FAILURE action and no payload provided', () => {
-    run({ failure: true });
-  });
+  describe('redux-form compatible version', () => {
+    beforeEach(() => {
+      rfHandler(values, (action) => {
+        iterator = handleRoutinePromiseAction(action);
+        resolve = action.payload.defer.resolve;
+        reject = action.payload.defer.reject;
+      }, props);
+    });
 
-  it('rejects promise with payload if got FAILURE action and payload provided', () => {
-    run({ failure: { payload: 'failure payload' } });
+    it('resolves promise if got SUCCESS action', () => {
+      run({ success: true }, true);
+    });
+
+    it('resolves promise without payload if got SUCCESS action and payload provided', () => {
+      run({ success: { payload: 'success payload' } }, true);
+    });
+
+    it('rejects promise with failure if got FAILURE action and no payload provided', () => {
+      run({ failure: true }, true);
+    });
+
+    it('rejects promise with payload if got FAILURE action and payload provided', () => {
+      run({ failure: { payload: 'failure payload' } }, true);
+    });
   });
 });
