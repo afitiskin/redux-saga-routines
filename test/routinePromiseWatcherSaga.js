@@ -2,33 +2,44 @@ import { describe, it } from 'mocha';
 import { expect } from 'chai';
 import { takeEvery, take, race, put, call, all } from 'redux-saga/effects';
 
-import routinesWatcherSaga, { handlePromiseAction } from '../src/routinesWatcherSaga';
-import { PROMISE_ACTION } from '../src/constants';
-import createRoutine from '../src/createRoutine';
+import routinesWatcherSaga, { handleRoutinePromiseAction } from '../src/routinePromiseWatcherSaga';
+import { ROUTINE_PROMISE_ACTION } from '../src/constants';
 
-describe('routinesWatcherSaga', () => {
-  it('take every promise action and run promise handler', () => {
+import createRoutine from '../src/createRoutine';
+import bindRoutineToReduxForm from '../src/bindRoutineToReduxForm';
+
+describe('routinePromiseWatcherSaga', () => {
+  it('take every routine promise action and run promise handler', () => {
     const iterator = routinesWatcherSaga();
 
-    expect(iterator.next().value).to.eql(takeEvery(PROMISE_ACTION, handlePromiseAction));
+    expect(iterator.next().value).to.eql(takeEvery(ROUTINE_PROMISE_ACTION, handleRoutinePromiseAction));
     expect(iterator.next().done).to.equal(true);
   });
 });
 
-describe('handlePromiseAction saga', () => {
+describe('handleRoutinePromiseAction saga', () => {
   const routine = createRoutine('A');
-  const data = 'some data';
+  const rfHandler = bindRoutineToReduxForm(routine);
+
+  const values = {
+    a: 4,
+    b: 2,
+  };
+  const props = {
+    x: 1,
+    y: 2,
+  };
 
   let iterator;
   let resolve;
   let reject;
 
   beforeEach(() => {
-    routine(data, (action) => {
-      iterator = handlePromiseAction(action);
+    rfHandler(values, (action) => {
+      iterator = handleRoutinePromiseAction(action);
       resolve = action.payload.defer.resolve;
       reject = action.payload.defer.reject;
-    });
+    }, props);
   });
 
   const run = (winner) => {
@@ -36,7 +47,7 @@ describe('handlePromiseAction saga', () => {
     // check if request action raised
     expect(iterator.next().value).to.deep.equal(all([
       race({ success: take(routine.SUCCESS), failure: take(routine.FAILURE) }),
-      put(routine.trigger(data)),
+      put(routine.trigger({ values, props })),
     ]));
 
     const getPayload = (data) => (data && data.payload) || data;

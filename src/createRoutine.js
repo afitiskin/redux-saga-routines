@@ -1,37 +1,17 @@
-import stages from './routineStages';
-import { PROMISE_ACTION } from './constants';
+import { createAction } from 'redux-actions';
+import routineStages from './routineStages';
 
-const identity = i => i;
+export default function createRoutine(typePrefix, ...params) {
+  const createActionCreator = (type) => createAction(`${typePrefix}/${type}`, ...params);
 
-export default function createRoutine(routineName = '', payloadCreator = identity) {
-  if (typeof routineName !== 'string') {
-    throw new Error('Invalid routine name, it should be a string');
-  }
-
-  const routineParams = stages.reduce((result, stage) => {
-    const stageActionType = `${routineName}_${stage}`;
-    const stageActionCreator = (payload) => ({
-      type: stageActionType,
-      payload: payloadCreator(payload),
-    });
-    stageActionCreator.ACTION_TYPE = stageActionType;
-
-    return Object.assign(result, {
-      [stage]: stageActionType,
-      [stage.toLowerCase()]: stageActionCreator,
-    });
-  }, {});
-
-  const routine = (data, dispatch) => {
-    return new Promise((resolve, reject) => dispatch({
-      type: PROMISE_ACTION,
-      payload: {
-        data,
-        params: routineParams,
-        defer: { resolve, reject },
-      },
-    }));
-  };
-
-  return Object.assign(routine, routineParams);
+  return routineStages.reduce(
+    (result, stage) => {
+      const actionCreator = createActionCreator(stage);
+      return Object.assign(result, {
+        [stage.toLowerCase()]: actionCreator,
+        [stage.toUpperCase()]: actionCreator.toString(),
+      });
+    },
+    createActionCreator(routineStages[0])
+  );
 }

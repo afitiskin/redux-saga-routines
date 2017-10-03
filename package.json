@@ -71,5 +71,7 @@
     "prepublish": "npm run build"
   },
   "license": "MIT",
-  "dependencies": {}
+  "dependencies": {
+    "redux-actions": "^2.2.1"
+  }
 }

@@ -1,72 +1,195 @@
 import { describe, it } from 'mocha';
 import { expect } from 'chai';
-import sinon from 'sinon';
 
 import createRoutine from '../src/createRoutine';
-import { PROMISE_ACTION } from '../src/constants';
 
 const PREFIX = 'PREFIX';
-
-const TRIGGER = `${PREFIX}_TRIGGER`;
-const REQUEST = `${PREFIX}_REQUEST`;
-const SUCCESS = `${PREFIX}_SUCCESS`;
-const FAILURE = `${PREFIX}_FAILURE`;
-const FULFILL = `${PREFIX}_FULFILL`;
-
-const data = {
-  some: 'data',
-};
+const TRIGGER = `${PREFIX}/TRIGGER`;
+const REQUEST = `${PREFIX}/REQUEST`;
+const SUCCESS = `${PREFIX}/SUCCESS`;
+const FAILURE = `${PREFIX}/FAILURE`;
+const FULFILL = `${PREFIX}/FULFILL`;
 
 describe('createRoutine', () => {
   it('should be a function', () => {
     expect(createRoutine).to.be.a('function');
   });
 
-  it('should create a new routine', () => {
+  it('should create new routine', () => {
+    const payload = {
+      some: 'data',
+    };
+    const triggerAction = {
+      type: TRIGGER,
+      payload,
+    };
+    const requestAction = {
+      type: REQUEST,
+      payload,
+    };
+    const successAction = {
+      type: SUCCESS,
+      payload,
+    };
+    const failureAction = {
+      type: FAILURE,
+      payload,
+    };
+    const fulfillAction = {
+      type: FULFILL,
+      payload,
+    };
+
     const routine = createRoutine(PREFIX);
-    const dispatch = sinon.spy();
 
     expect(routine).to.be.a('function');
-    expect(routine(data, dispatch)).to.be.a('promise');
-    expect(dispatch.calledOnce).to.equal(true);
+    expect(routine.toString()).to.equal(TRIGGER);
+    expect(routine(payload)).to.deep.equal(triggerAction);
 
-    const call = dispatch.getCall(0);
-    const action = call.args[0];
-
-    expect(call.args).to.have.length(1);
-
-    expect(action).to.have.property('type');
-    expect(action).to.have.property('payload');
-
-    expect(action.type).to.equal(PROMISE_ACTION);
-
-    expect(action.payload).to.have.property('data');
-    expect(action.payload.data).to.eql(data);
-
-    expect(action.payload).to.have.property('defer');
-    expect(action.payload.defer).to.have.property('resolve');
-    expect(action.payload.defer).to.have.property('reject');
-
-    expect(action.payload).to.have.property('params');
-
-    expect(routine.TRIGGER).to.equal(TRIGGER);
     expect(routine.trigger).to.be.a('function');
-    expect(routine.trigger(data)).to.eql({ type: TRIGGER, payload: data });
+    expect(routine.TRIGGER).to.equal(TRIGGER);
+    expect(routine.trigger.toString()).to.equal(TRIGGER);
+    expect(routine.trigger(payload)).to.deep.equal(triggerAction);
 
-    expect(routine.REQUEST).to.equal(REQUEST);
     expect(routine.request).to.be.a('function');
-    expect(routine.request(data)).to.eql({ type: REQUEST, payload: data });
+    expect(routine.REQUEST).to.equal(REQUEST);
+    expect(routine.request.toString()).to.equal(REQUEST);
+    expect(routine.request(payload)).to.deep.equal(requestAction);
 
-    expect(routine.SUCCESS).to.equal(SUCCESS);
     expect(routine.success).to.be.a('function');
-    expect(routine.success(data)).to.eql({ type: SUCCESS, payload: data });
+    expect(routine.SUCCESS).to.equal(SUCCESS);
+    expect(routine.success.toString()).to.equal(SUCCESS);
+    expect(routine.success(payload)).to.deep.equal(successAction);
 
-    expect(routine.FAILURE).to.equal(FAILURE);
     expect(routine.failure).to.be.a('function');
-    expect(routine.failure(data)).to.eql({ type: FAILURE, payload: data });
+    expect(routine.FAILURE).to.equal(FAILURE);
+    expect(routine.failure.toString()).to.equal(FAILURE);
+    expect(routine.failure(payload)).to.deep.equal(failureAction);
 
-    expect(routine.FULFILL).to.equal(FULFILL);
     expect(routine.fulfill).to.be.a('function');
-    expect(routine.fulfill(data)).to.eql({ type: FULFILL, payload: data });
+    expect(routine.FULFILL).to.equal(FULFILL);
+    expect(routine.fulfill.toString()).to.equal(FULFILL);
+    expect(routine.fulfill(payload)).to.deep.equal(fulfillAction);
+  });
+
+  it('should create new routine with provided payload creator', () => {
+    const routine = createRoutine(PREFIX, (payload) => payload * 2);
+
+    const originalPayload = 42;
+    const payload = 84;
+
+    const triggerAction = {
+      type: TRIGGER,
+      payload,
+    };
+    const requestAction = {
+      type: REQUEST,
+      payload,
+    };
+    const successAction = {
+      type: SUCCESS,
+      payload,
+    };
+    const failureAction = {
+      type: FAILURE,
+      payload,
+    };
+    const fulfillAction = {
+      type: FULFILL,
+      payload,
+    };
+
+    expect(routine).to.be.a('function');
+    expect(routine.toString()).to.equal(TRIGGER);
+    expect(routine(originalPayload)).to.deep.equal(triggerAction);
+
+    expect(routine.trigger).to.be.a('function');
+    expect(routine.TRIGGER).to.equal(TRIGGER);
+    expect(routine.trigger.toString()).to.equal(TRIGGER);
+    expect(routine.trigger(originalPayload)).to.deep.equal(triggerAction);
+
+    expect(routine.request).to.be.a('function');
+    expect(routine.REQUEST).to.equal(REQUEST);
+    expect(routine.request.toString()).to.equal(REQUEST);
+    expect(routine.request(originalPayload)).to.deep.equal(requestAction);
+
+    expect(routine.success).to.be.a('function');
+    expect(routine.SUCCESS).to.equal(SUCCESS);
+    expect(routine.success.toString()).to.equal(SUCCESS);
+    expect(routine.success(originalPayload)).to.deep.equal(successAction);
+
+    expect(routine.failure).to.be.a('function');
+    expect(routine.FAILURE).to.equal(FAILURE);
+    expect(routine.failure.toString()).to.equal(FAILURE);
+    expect(routine.failure(originalPayload)).to.deep.equal(failureAction);
+
+    expect(routine.fulfill).to.be.a('function');
+    expect(routine.FULFILL).to.equal(FULFILL);
+    expect(routine.fulfill.toString()).to.equal(FULFILL);
+    expect(routine.fulfill(originalPayload)).to.deep.equal(fulfillAction);
+  });
+
+  it('should create new routine with provided meta creator', () => {
+    const meta = { test: 'meta' };
+    const routine = createRoutine(PREFIX, (payload) => payload, () => meta);
+
+    const payload = {
+      some: 'data',
+    };
+
+    const triggerAction = {
+      type: TRIGGER,
+      payload,
+      meta,
+    };
+    const requestAction = {
+      type: REQUEST,
+      payload,
+      meta,
+    };
+    const successAction = {
+      type: SUCCESS,
+      payload,
+      meta,
+    };
+    const failureAction = {
+      type: FAILURE,
+      payload,
+      meta,
+    };
+    const fulfillAction = {
+      type: FULFILL,
+      payload,
+      meta,
+    };
+
+    expect(routine).to.be.a('function');
+    expect(routine.toString()).to.equal(TRIGGER);
+    expect(routine(payload)).to.deep.equal(triggerAction);
+
+    expect(routine.trigger).to.be.a('function');
+    expect(routine.TRIGGER).to.equal(TRIGGER);
+    expect(routine.trigger.toString()).to.equal(TRIGGER);
+    expect(routine.trigger(payload)).to.deep.equal(triggerAction);
+
+    expect(routine.request).to.be.a('function');
+    expect(routine.REQUEST).to.equal(REQUEST);
+    expect(routine.request.toString()).to.equal(REQUEST);
+    expect(routine.request(payload)).to.deep.equal(requestAction);
+
+    expect(routine.success).to.be.a('function');
+    expect(routine.SUCCESS).to.equal(SUCCESS);
+    expect(routine.success.toString()).to.equal(SUCCESS);
+    expect(routine.success(payload)).to.deep.equal(successAction);
+
+    expect(routine.failure).to.be.a('function');
+    expect(routine.FAILURE).to.equal(FAILURE);
+    expect(routine.failure.toString()).to.equal(FAILURE);
+    expect(routine.failure(payload)).to.deep.equal(failureAction);
+
+    expect(routine.fulfill).to.be.a('function');
+    expect(routine.FULFILL).to.equal(FULFILL);
+    expect(routine.fulfill.toString()).to.equal(FULFILL);
+    expect(routine.fulfill(payload)).to.deep.equal(fulfillAction);
   });
 });

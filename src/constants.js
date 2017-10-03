@@ -1,1 +1,1 @@
-export const PROMISE_ACTION = '@@redux-saga-routines/PROMISE';
+export const ROUTINE_PROMISE_ACTION = '@@redux-saga-routines/PROMISE';

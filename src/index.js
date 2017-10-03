@@ -1,5 +1,5 @@
-import routinesWatcherSaga from './routinesWatcherSaga';
-import bindRoutineCreators from './bindRoutineCreators';
-import createRoutine from './createRoutine';
+import routinePromiseWatcherSaga from './routinePromiseWatcherSaga';
+import bindRoutineToReduxForm from './bindRoutineToReduxForm';
+import createRoutine from './bindRoutineToReduxForm';
 
-export { routinesWatcherSaga, bindRoutineCreators, createRoutine };
+export { routinePromiseWatcherSaga, bindRoutineToReduxForm, createRoutine };
