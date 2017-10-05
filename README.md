@@ -32,20 +32,20 @@ const routine = createRoutine('ACTION_TYPE_PREFIX');
 
 You can access all action types using `TRIGGER`, `REQUEST`, `SUCCESS`, `FAILURE`, `FULFILL` attributes of `routine` object:
 ```javascript
-routine.TRIGGER === 'ACTION_TYPE_PREFIX_TRIGGER';
-routine.REQUEST === 'ACTION_TYPE_PREFIX_REQUEST';
-routine.SUCCESS === 'ACTION_TYPE_PREFIX_SUCCESS';
-routine.FAILURE === 'ACTION_TYPE_PREFIX_FAILURE';
-routine.FULFILL === 'ACTION_TYPE_PREFIX_FULFILL';
+routine.TRIGGER === 'ACTION_TYPE_PREFIX/TRIGGER';
+routine.REQUEST === 'ACTION_TYPE_PREFIX/REQUEST';
+routine.SUCCESS === 'ACTION_TYPE_PREFIX/SUCCESS';
+routine.FAILURE === 'ACTION_TYPE_PREFIX/FAILURE';
+routine.FULFILL === 'ACTION_TYPE_PREFIX/FULFILL';
 ```
 
 You also have 5 action creators: `trigger`, `request`, `success`, `failure`, `fulfill`:
 ```javascript
-routine.trigger(payload) === { type: 'ACTION_TYPE_PREFIX_TRIGGER', payload };
-routine.request(payload) === { type: 'ACTION_TYPE_PREFIX_REQUEST', payload };
-routine.success(payload) === { type: 'ACTION_TYPE_PREFIX_SUCCESS', payload };
-routine.failure(payload) === { type: 'ACTION_TYPE_PREFIX_FAILURE', payload };
-routine.fulfill(payload) === { type: 'ACTION_TYPE_PREFIX_FULFILL', payload };
+routine.trigger(payload) === { type: 'ACTION_TYPE_PREFIX/TRIGGER', payload };
+routine.request(payload) === { type: 'ACTION_TYPE_PREFIX/REQUEST', payload };
+routine.success(payload) === { type: 'ACTION_TYPE_PREFIX/SUCCESS', payload };
+routine.failure(payload) === { type: 'ACTION_TYPE_PREFIX/FAILURE', payload };
+routine.fulfill(payload) === { type: 'ACTION_TYPE_PREFIX/FULFILL', payload };
 ```
 
 Routine by itself is a trigger action creator function:
