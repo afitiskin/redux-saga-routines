@@ -269,15 +269,15 @@ function* validateFormWatcherSaga() {
 }
 
 function* validate(action) {
-  const formData = action.payload;
+  const { values, props } = action.payload;
 
-  if (!isValid(formData)) {
+  if (!isValid(values, props)) {
     // client-side validation failed
-    const errors = getFormErrors(formData);
+    const errors = getFormErrors(values, props);
     yield put(submitMyForm.failure(new SubmissionError(errors)));
   } else {
     // send form data to server
-    yield call(sendFormDataToServer, formData);
+    yield call(sendFormDataToServer, values);
   }
 
   // trigger fulfill action to end routine lifecycle
