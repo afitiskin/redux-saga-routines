@@ -3,7 +3,7 @@ import { PROMISE_ACTION } from './constants';
 
 const identity = i => i;
 
-export default function createRoutine(routineName = '', payloadCreator = identity) {
+export default function createRoutine(routineName = '', payloadCreator = identity, reduxFormFallback = true) {
   if (typeof routineName !== 'string') {
     throw new Error('Invalid routine name, it should be a string');
   }
@@ -29,6 +29,7 @@ export default function createRoutine(routineName = '', payloadCreator = identit
         data,
         params: routineParams,
         defer: { resolve, reject },
+        reduxFormFallback,
       },
     }));
   };

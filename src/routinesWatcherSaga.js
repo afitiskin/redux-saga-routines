@@ -4,7 +4,7 @@ import { PROMISE_ACTION } from './constants'
 const getPayload = (data) => (data && data.payload) || data;
 
 export function* handlePromiseAction(action) {
-  const { data, params, defer: { resolve, reject } } = action.payload;
+  const { data, params, defer: { resolve, reject }, reduxFormFallback } = action.payload;
 
   const [ {success, failure} ] = yield all([
     race({
@@ -13,9 +13,9 @@ export function* handlePromiseAction(action) {
     }),
     put(params.trigger(data)),
   ]);
-  
+
   if (success) {
-    yield call(resolve);
+    yield reduxFormFallback ? call(resolve) : call(resolve, getPayload(success));
   } else {
     yield call(reject, getPayload(failure));
   }
