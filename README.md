@@ -221,7 +221,7 @@ const sagas = [
 sagas.forEach(sagaMiddleware.run);
 ```
 
-Now we are ready. Thare is special `promisifyRoutine` helper, that wraps your routine in function with signature: `(values, dispatch) => Promise`.
+Now we are ready. Thare is special `promisifyRoutine` helper, that wraps your routine in function with signature: `(payload, dispatch) => Promise`.
 See example below:
 First, create routine:
 ```javascript
@@ -280,7 +280,7 @@ class MyComponent extends React.Component {
     // internally when you call myRoutinePromiseCreator() special action with type ROUTINE_PROMISE_ACTION is dispatched
     // this special action is handled by routinePromiseWatcherSaga
     
-    // to resolve promise you need to dispatch myRoutine.success(successPayload) action, successPayload will be passed to resolved promose
+    // to resolve promise you need to dispatch myRoutine.success(successPayload) action, successPayload will be passed to resolved promise
     // if  myRoutine.failure(failurePayload) is dispatched, promise will be rejected with failurePayload.
     
     // we just want to wait 5 seconds and then resolve promise with 'voila!' message:
@@ -295,7 +295,7 @@ class MyComponent extends React.Component {
     //   5000,
     // );
     
-    // of course you don't have to do it in ypur component
+    // of course you don't have to do it in your component
     // you can do it in your saga
     // see below
   }
@@ -318,14 +318,17 @@ You are able to resolve/reject given promise in your saga:
 import { myRoutine } from './routines';
 
 function* myRoutineTriggerWatcher() {
-  // run validation on every trigger action
-  yield takeEvery(myRoutine.TRIGGER, handleRoutine)
+  // when you call myRoutinePromiseCreator(somePayload) 
+  // internally myRoutine.trigger(somePayload) action is dispatched
+  // we take every routine trigger actions and handle them
+  yield takeEvery(myRoutine.TRIGGER, handleTriggerAction)
 }
 
-function* handleRoutine(action) {
+function* handleTriggerAction(action) {
   const { payload } = action; // here payload is somePayload passed from myRoutinePromiseCreator(somePayload)
+  const isDataCorrect = verifyData(payload);
 
-  if (isOk()) {
+  if (isDataCorrect) {
     // send data to server
     yield call(sendFormDataToServer, payload);
   } else {
@@ -341,12 +344,12 @@ function* sendFormDataToServer(data) {
   try {
     // trigger request action
     yield put(myRoutine.request());
-    // perform request to '/submit' to send form data
+    // perform request to '/endpoint'
     const response = yield call(apiClient.request, '/endpoint', data);
-    // if request successfully finished we need to resolve promise
+    // if request successfully finished we resolve promise with response data
     yield put(myRoutine.success(response.data));
   } catch (error) {
-    // if request failed
+    // if request failed we reject promise with error message
     yield put(myRoutine.failure(error.message);
   }
 }
@@ -354,14 +357,14 @@ function* sendFormDataToServer(data) {
 
 
 ### `redux-saga`, `redux-form`, `redux-saga-routines` combo
-If you want to use combo of `redux-saga`, `redux-form` and `redux-saga-routines`, you have to prepare a bit.
-Since `redux-form` validation based on promises, we have to handle special action type to make it possible to handle `redux-form` validation in your saga.
+You are also allowed to use combo of `redux-saga`, `redux-form` and `redux-saga-routines`!
+Since `redux-form` validation based on promises, you are able to handle `redux-form` validation in your saga.
 To achive this just add `routinePromiseWatcherSaga` in your `sagaMiddleware.run()`, like in example above.
 
-Now we are ready. There are special `bindRoutineToReduxForm` helper, that wraps your routine in function with `redux-form` compatible signature: `(values, dispatch, props) => Promise`.
-See example below:
+There are special `bindRoutineToReduxForm` helper, that wraps your routine in function with `redux-form` compatible signature: `(values, dispatch, props) => Promise` (it works just like `promisifyRoutine` but more specific to be compatible with full `redux-form` functionality)
 
-First, create routine:
+
+First, create routine and it's wrapper for `redux-form`:
 ```javascript
 // routines.js
 
@@ -397,40 +400,43 @@ Now you are able to handle form submission in your saga:
 ```javascript
 // saga.js
 import { SubmissionError } from 'redux-form';
-import { submitMyForm } from './routines';
+import { submitFormRoutine } from './routines';
 
 function* validateFormWatcherSaga() {
   // run validation on every trigger action
-  yield takeEvery(submitMyForm.TRIGGER, validate)
+  yield takeEvery(submitFormRoutine.TRIGGER, validate)
 }
 
 function* validate(action) {
+  // redux-form pass form values and component props to submit handler
+  // so they passed to trigger action as an action payload
   const { values, props } = action.payload;
 
   if (!isValid(values, props)) {
     // client-side validation failed
     const errors = getFormErrors(values, props);
-    yield put(submitMyForm.failure(new SubmissionError(errors)));
+    // reject promise given to redux-form, pass errors as SubmissionError object according to redux-form docs
+    yield put(submitFormRoutine.failure(new SubmissionError(errors)));
   } else {
     // send form data to server
     yield call(sendFormDataToServer, values);
   }
 
   // trigger fulfill action to end routine lifecycle
-  yield put(submitMyForm.fulfill());
+  yield put(submitFormRoutine.fulfill());
 }
 
 function* sendFormDataToServer(formData) {
   try {
     // trigger request action
-    yield put(submitMyForm.request());
+    yield put(submitFormRoutine.request());
     // perform request to '/submit' to send form data
     const response = yield call(apiClient.request, '/submit', formData);
     // if request successfully finished
-    yield put(submitMyForm.success(response.data));
+    yield put(submitFormRoutine.success(response.data));
   } catch (error) {
     // if request failed
-    yield put(submitMyForm.failure(new SubmissionError({ _error: error.message })));
+    yield put(submitFormRoutine.failure(new SubmissionError({ _error: error.message })));
   }
 }
 ```
