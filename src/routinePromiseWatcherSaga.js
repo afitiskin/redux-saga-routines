@@ -4,14 +4,24 @@ import { ROUTINE_PROMISE_ACTION } from './constants'
 const getPayload = (data) => (data && data.payload) || data;
 
 export function* handleRoutinePromiseAction(action) {
-  const { values, props, routine, defer: { resolve, reject }, reduxFormCompatible } = action.payload;
+  const {
+    payload,
+    meta: {
+      routine,
+      reduxFormCompatible,
+      defer: {
+        resolve,
+        reject,
+      },
+    },
+  } = action;
 
   const [ {success, failure} ] = yield all([
     race({
       success: take(routine.SUCCESS),
       failure: take(routine.FAILURE),
     }),
-    put(routine.trigger({ values, props })),
+    put(routine.trigger(payload)),
   ]);
 
   if (success) {

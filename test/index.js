@@ -4,6 +4,7 @@ import { expect } from 'chai';
 
 import {
   createRoutine,
+  promisifyRoutine,
   bindRoutineToReduxForm,
   routinePromiseWatcherSaga,
   ROUTINE_PROMISE_ACTION,
@@ -11,11 +12,11 @@ import {
 
 describe('Redux saga routines', () => {
   it('should export createRoutine function', () => {
-    expect(createRoutine).to.be.ok;
+    expect(createRoutine).to.be.a('function');
   });
 
   it('should export bindRoutineToReduxForm function', () => {
-    expect(bindRoutineToReduxForm).to.be.ok;
+    expect(bindRoutineToReduxForm).to.be.a('function');
   });
 
   it('should export routinePromiseWatcherSaga function', () => {
@@ -23,6 +24,10 @@ describe('Redux saga routines', () => {
   });
 
   it('should export ROUTINE_PROMISE_ACTION action type', () => {
-    expect(ROUTINE_PROMISE_ACTION).to.be.ok;
+    expect(ROUTINE_PROMISE_ACTION).to.be.a('string');
+  });
+
+  it('should export promisifyRoutine function', () => {
+    expect(promisifyRoutine).to.be.a('function');
   });
 });

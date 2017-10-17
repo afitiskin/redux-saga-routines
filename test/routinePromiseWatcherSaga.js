@@ -6,6 +6,7 @@ import routinesWatcherSaga, { handleRoutinePromiseAction } from '../src/routineP
 import { ROUTINE_PROMISE_ACTION } from '../src/constants';
 
 import createRoutine from '../src/createRoutine';
+import promisifyRoutine from '../src/promisifyRoutine';
 import bindRoutineToReduxForm from '../src/bindRoutineToReduxForm';
 
 describe('routinePromiseWatcherSaga', () => {
@@ -19,35 +20,43 @@ describe('routinePromiseWatcherSaga', () => {
 
 describe('handleRoutinePromiseAction saga', () => {
   const routine = createRoutine('A');
+  const handler = promisifyRoutine(routine);
   const rfHandler = bindRoutineToReduxForm(routine);
 
-  const values = {
+  const payload = {
     a: 4,
     b: 2,
   };
+
+  const values = {
+    x: 5,
+    y: 8,
+  };
+
   const props = {
-    x: 1,
-    y: 2,
+    some: 'value',
+    ok: true,
   };
 
   let iterator;
   let resolve;
   let reject;
+  let run;
 
-  const run = (winner, reduxFormCompatible = false) => {
+  const getRunner = (triggerPayload, reduxFormCompatible) => (winner) => {
     // check if race between SUCCESS and FAILURE started
     // check if request action raised
     expect(iterator.next().value).to.deep.equal(all([
       race({ success: take(routine.SUCCESS), failure: take(routine.FAILURE) }),
-      put(routine.trigger({ values, props })),
+      put(routine.trigger(triggerPayload)),
     ]));
 
-    const getPayload = (data) => (data && data.payload) || data;
+    const getWinnerPayload = (data) => (data && data.payload) || data;
     let result;
     if (winner.success) {
-      result = reduxFormCompatible ? call(resolve) : call(resolve, getPayload(winner.success));
+      result = reduxFormCompatible ? call(resolve) : call(resolve, getWinnerPayload(winner.success));
     } else {
-      result = call(reject, getPayload(winner.failure));
+      result = call(reject, getWinnerPayload(winner.failure));
     }
 
     // check if promise resolve / reject called
@@ -58,20 +67,12 @@ describe('handleRoutinePromiseAction saga', () => {
 
   describe('default version', () => {
     beforeEach(() => {
-      resolve = () => 'resolve';
-      reject = () => 'reject';
-
-      const action = {
-        type: ROUTINE_PROMISE_ACTION,
-        payload: {
-          values,
-          props,
-          routine,
-          defer: { resolve, reject },
-        },
-      };
-
-      iterator = handleRoutinePromiseAction(action);
+      run = getRunner(payload, false);
+      handler(payload, (action) => {
+        iterator = handleRoutinePromiseAction(action);
+        resolve = action.meta.defer.resolve;
+        reject = action.meta.defer.reject;
+      });
     });
 
     it('resolves promise if got SUCCESS action', () => {
@@ -93,10 +94,11 @@ describe('handleRoutinePromiseAction saga', () => {
 
   describe('redux-form compatible version', () => {
     beforeEach(() => {
+      run = getRunner({ values, props }, true);
       rfHandler(values, (action) => {
         iterator = handleRoutinePromiseAction(action);
-        resolve = action.payload.defer.resolve;
-        reject = action.payload.defer.reject;
+        resolve = action.meta.defer.resolve;
+        reject = action.meta.defer.reject;
       }, props);
     });
 

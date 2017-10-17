@@ -206,9 +206,8 @@ function* fetchDataFromServer() {
 }
 ```
 
-### `redux-saga`, `redux-form`, `redux-saga-routines` combo
-If you want to use combo of `redux-saga`, `redux-form` and `redux-saga-routines`, you have to prepare a bit.
-Since `redux-form` validation based on promises, we have to handle special action type to make it possible to handle `redux-form` validation in your saga.
+### Wrap routine into promise
+Sometimes it is useful to use promises (especially with 3rd-party components). With `redux-saga-routines` you are able to wrap your routine into promise and handle it in your saga!
 To achive this just add `routinePromiseWatcherSaga` in your `sagaMiddleware.run()`, for example like this:
 ```javascript
 import { routinePromiseWatcherSaga } from 'redux-saga-routines';
@@ -221,6 +220,143 @@ const sagas = [
 ];
 sagas.forEach(sagaMiddleware.run);
 ```
+
+Now we are ready. Thare is special `promisifyRoutine` helper, that wraps your routine in function with signature: `(values, dispatch) => Promise`.
+See example below:
+First, create routine:
+```javascript
+// routines.js
+
+import { createRoutine, promisifyRoutine } from 'redux-saga-routines';
+export const myRoutine = createRoutine('MY_ROUTINE');
+export const myRoutinePromiseCreator = promisifyRoutine(myRoutine);
+```
+
+Then, use it in your form component:
+```javascript
+// MyComponent.js
+import { bindPromiseCreators } from 'redux-saga-routines';
+import { myRoutine, myRoutinePromiseCreator } from './routines';
+
+// since promise creator signature is (values, dispatch) => Promise
+// we have to bind it to dispatch using special helper bindPromiseCreator
+
+class MyComponent extends React.Component {
+  static mapStateToProps(state) {
+    // return props object from selected from state
+  }
+  
+  static mapDispatchToProps(dispatch) {
+    return {
+      ...bindPromiseCreators({ 
+        myRoutinePromiseCreator,
+        // other promise creators can be here... 
+      }, dispatch),
+      
+      // here you can use bindActionCreators from redux
+      // to bind simple action creators
+      // ...bindActionCreators({ mySimpleAction1, mySimpleAction2 }, dispatch)
+      
+      // or other helpers to bind other functions to store's dispatch
+      // ...
+      
+      // or just pass dispatch as a prop to component
+      dispatch,
+    };
+  }
+
+
+  handleClick() {
+    const promise = this.props.myRoutinePromiseCreator(somePayload);
+    // so, call of myRoutinePromiseCreator returns promise
+    // you can use this promise as you want
+    
+    promise.then(
+      (successPayload) => console.log('success :)', successPayload),
+      (failurePayload) => console.log('failure :(', failurePayload),
+    );
+    
+    
+    // internally when you call myRoutinePromiseCreator() special action with type ROUTINE_PROMISE_ACTION is dispatched
+    // this special action is handled by routinePromiseWatcherSaga
+    
+    // to resolve promise you need to dispatch myRoutine.success(successPayload) action, successPayload will be passed to resolved promose
+    // if  myRoutine.failure(failurePayload) is dispatched, promise will be rejected with failurePayload.
+    
+    // we just want to wait 5 seconds and then resolve promise with 'voila!' message:
+    setTimeout(
+      () => this.props.dispatch(myRoutine.success('voila!')),
+      5000,
+    );
+    
+    // same example, but with promise rejection:
+    // setTimeout(
+    //   () => this.props.dispatch(myRoutine.failure('something went wrong...')),
+    //   5000,
+    // );
+    
+    // of course you don't have to do it in ypur component
+    // you can do it in your saga
+    // see below
+  }
+  
+  render() {
+    return (
+      <button onClick={() => this.handleClick()}>
+        {/* your form fields here... */}
+      </form>
+    );
+  }
+}
+
+export default connect(MyComponent.mapStateToProps, MyComponent.mapDispatchToProps)(MyComponent);
+```
+
+You are able to resolve/reject given promise in your saga:
+```javascript
+// saga.js
+import { myRoutine } from './routines';
+
+function* myRoutineTriggerWatcher() {
+  // run validation on every trigger action
+  yield takeEvery(myRoutine.TRIGGER, handleRoutine)
+}
+
+function* handleRoutine(action) {
+  const { payload } = action; // here payload is somePayload passed from myRoutinePromiseCreator(somePayload)
+
+  if (isOk()) {
+    // send data to server
+    yield call(sendFormDataToServer, payload);
+  } else {
+    // reject given promise
+    yield put(myRoutine.failure('something went wrong'));
+  }
+
+  // trigger fulfill action to end routine lifecycle
+  yield put(myRoutine.fulfill());
+}
+
+function* sendFormDataToServer(data) {
+  try {
+    // trigger request action
+    yield put(myRoutine.request());
+    // perform request to '/submit' to send form data
+    const response = yield call(apiClient.request, '/endpoint', data);
+    // if request successfully finished we need to resolve promise
+    yield put(myRoutine.success(response.data));
+  } catch (error) {
+    // if request failed
+    yield put(myRoutine.failure(error.message);
+  }
+}
+```
+
+
+### `redux-saga`, `redux-form`, `redux-saga-routines` combo
+If you want to use combo of `redux-saga`, `redux-form` and `redux-saga-routines`, you have to prepare a bit.
+Since `redux-form` validation based on promises, we have to handle special action type to make it possible to handle `redux-form` validation in your saga.
+To achive this just add `routinePromiseWatcherSaga` in your `sagaMiddleware.run()`, like in example above.
 
 Now we are ready. There are special `bindRoutineToReduxForm` helper, that wraps your routine in function with `redux-form` compatible signature: `(values, dispatch, props) => Promise`.
 See example below:
