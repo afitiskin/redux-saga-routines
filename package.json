@@ -15,6 +15,8 @@
   "module": "es/index.js",
   "jsnext:main": "es/index.js",
   "devDependencies": {
+    "@types/redux-actions": "^2.2.2",
+    "@types/redux-form": "^7.0.6",
     "babel-cli": "^6.24.1",
     "babel-eslint": "^7.2.3",
     "babel-plugin-transform-runtime": "^6.23.0",
@@ -32,6 +34,8 @@
     "sinon": "^2.1.0"
   },
   "peerDependencies": {
+    "@types/redux-actions": "^2.2",
+    "@types/redux-form": "^7.0",
     "redux-saga": "^0.15.0"
   },
   "repository": {
@@ -50,6 +54,10 @@
     {
       "name": "Mark Haussmann",
       "email": "mark.haussmann@gmail.com"
+    },
+    {
+      "name": "Karol Janyst",
+      "email": "lapkom@gmail.com"
     }
   ],
   "maintainers": [
@@ -73,7 +81,6 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@types/redux-actions": "^2.2.2",
     "redux-actions": "^2.2.1"
   }
 }
