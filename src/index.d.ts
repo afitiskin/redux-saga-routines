@@ -1,4 +1,3 @@
-import { Dispatch } from 'redux';
 import { ActionFunction0, ActionFunction1, ActionFunction2, ActionFunction3, ActionFunction4, Action, ActionFunctionAny, ActionMeta } from 'redux-actions';
 import { FormSubmitHandler } from 'redux-form';
 
