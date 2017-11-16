@@ -221,7 +221,7 @@ const sagas = [
 sagas.forEach(sagaMiddleware.run);
 ```
 
-Now we are ready. Thare is special `promisifyRoutine` helper, that wraps your routine in function with signature: `(payload, dispatch) => Promise`.
+Now we are ready. There is special `promisifyRoutine` helper, that wraps your routine in function with signature: `(payload, dispatch) => Promise`.
 See example below:
 First, create routine:
 ```javascript
