@@ -1,6 +1,6 @@
 {
   "name": "redux-saga-routines",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "description": "Routines for redux-saga also useful with redux-form",
   "keywords": [
     "redux",
@@ -29,14 +29,14 @@
     "eslint": "^4.10.0",
     "eslint-plugin-babel": "^4.1.2",
     "mocha": "^4.0.1",
-    "redux-saga": "^0.16.0",
+    "redux-saga": "^0.16.0 || ^1.0.0-0",
     "rimraf": "^2.6.2",
     "sinon": "^4.1.0"
   },
   "peerDependencies": {
     "@types/redux-actions": "^2.2",
     "@types/redux-form": "^7.0",
-    "redux-saga": "^0.16.0"
+    "redux-saga": "^0.16.0 || ^1.0.0-0"
   },
   "repository": {
     "type": "git",
@@ -58,6 +58,10 @@
     {
       "name": "Karol Janyst",
       "email": "lapkom@gmail.com"
+    },
+    {
+      "name": "Colin Dekker",
+      "email": "colin.dekker@outlook.com"
     }
   ],
   "maintainers": [
