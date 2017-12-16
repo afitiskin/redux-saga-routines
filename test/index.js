@@ -5,6 +5,7 @@ import { expect } from 'chai';
 import {
   createRoutine,
   promisifyRoutine,
+  bindPromiseCreators,
   bindRoutineToReduxForm,
   routinePromiseWatcherSaga,
   ROUTINE_PROMISE_ACTION,
@@ -13,6 +14,10 @@ import {
 describe('Redux saga routines', () => {
   it('should export createRoutine function', () => {
     expect(createRoutine).to.be.a('function');
+  });
+
+  it('should export bindPromiseCreators function', () => {
+    expect(bindPromiseCreators).to.be.a('function');
   });
 
   it('should export bindRoutineToReduxForm function', () => {
