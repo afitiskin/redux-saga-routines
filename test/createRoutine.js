@@ -43,7 +43,7 @@ describe('createRoutine', () => {
     const routine = createRoutine(PREFIX);
 
     expect(routine).to.be.a('function');
-    expect(routine.toString()).to.equal(TRIGGER);
+    expect(routine.toString()).to.equal(PREFIX);
     expect(routine(payload)).to.deep.equal(triggerAction);
 
     expect(routine.trigger).to.be.a('function');
@@ -100,7 +100,7 @@ describe('createRoutine', () => {
     };
 
     expect(routine).to.be.a('function');
-    expect(routine.toString()).to.equal(TRIGGER);
+    expect(routine.toString()).to.equal(PREFIX);
     expect(routine(originalPayload)).to.deep.equal(triggerAction);
 
     expect(routine.trigger).to.be.a('function');
@@ -164,7 +164,7 @@ describe('createRoutine', () => {
     };
 
     expect(routine).to.be.a('function');
-    expect(routine.toString()).to.equal(TRIGGER);
+    expect(routine.toString()).to.equal(PREFIX);
     expect(routine(payload)).to.deep.equal(triggerAction);
 
     expect(routine.trigger).to.be.a('function');
