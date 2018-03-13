@@ -79,6 +79,8 @@
   },
   "license": "MIT",
   "dependencies": {
-    "redux-actions": "^2.2.1"
+    "invariant": "^2.2.3",
+    "lodash": "^4.17.5",
+    "redux-actions": "^2.3.0"
   }
 }
