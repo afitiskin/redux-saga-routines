@@ -1,6 +1,6 @@
 {
   "name": "redux-saga-routines",
-  "version": "2.2.2",
+  "version": "2.2.3",
   "description": "Routines for redux-saga also useful with redux-form",
   "keywords": [
     "redux",
@@ -29,12 +29,12 @@
     "eslint": "^2.4.0",
     "eslint-plugin-babel": "^3.0.0",
     "mocha": "^2.3.4",
-    "redux-saga": "^0.15.0",
+    "redux-saga": ">=0.15.0",
     "rimraf": "^2.5.4",
     "sinon": "^2.1.0"
   },
   "peerDependencies": {
-    "redux-saga": "^0.15.0"
+    "redux-saga": ">=0.15.0"
   },
   "repository": {
     "type": "git",

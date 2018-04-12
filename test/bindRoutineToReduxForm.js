@@ -51,6 +51,6 @@ describe('bindRoutineToReduxForm', () => {
     expect(action.meta.routine).to.equal(routine);
 
     expect(action.meta).to.have.property('reduxFormCompatible');
-    expect(action.meta.reduxFormCompatible).to.be.true;
+    expect(action.meta.reduxFormCompatible).to.equal(true);
   });
 });
