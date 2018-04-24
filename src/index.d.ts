@@ -9,54 +9,56 @@ export interface RoutineTypes {
     FULFILL: string;
 }
 
-export type RoutineAction<T> = Action<T>;
-
-export type RoutineActionCreator<T> = (payload?: T) => RoutineAction<T>;
-
-export interface RoutineActionCreators {
-    trigger: RoutineActionCreator<any>;
-    request: RoutineActionCreator<any>;
-    success: RoutineActionCreator<any>;
-    failure: RoutineActionCreator<any>;
-    fulfill: RoutineActionCreator<any>;
+export interface RoutineActionCreators<TActionCreator> {
+    trigger: TActionCreator;
+    request: ActionFunctionAny<Action<any>>;
+    success: ActionFunctionAny<Action<any>>;
+    failure: ActionFunctionAny<Action<any>>;
+    fulfill: ActionFunctionAny<Action<any>>;
 }
 
-export type Routine<T> = RoutineTypes & RoutineActionCreators & T;
+export type Routine<TActionCreator> = TActionCreator & RoutineTypes & RoutineActionCreators<TActionCreator>;
 
 export function routinePromiseWatcherSaga(): Generator;
 
 export function createRoutine(
     typePrefix: string
-): Routine<ActionFunction0<RoutineAction<void>>>;
+): Routine<ActionFunctionAny<Action<any>>>;
 
 export function createRoutine<Payload>(
     typePrefix: string,
     payloadCreator: ActionFunction0<Payload>
-): Routine<ActionFunction0<RoutineAction<Payload>>>;
+): Routine<ActionFunction0<Action<Payload>>>;
 
 export function createRoutine<Payload, Arg1>(
     typePrefix: string,
     payloadCreator: ActionFunction1<Arg1, Payload>
-): Routine<ActionFunction1<Arg1, RoutineAction<Payload>>>;
+): Routine<ActionFunction1<Arg1, Action<Payload>>>;
 
 export function createRoutine<Payload, Arg1, Arg2>(
     typePrefix: string,
     payloadCreator: ActionFunction2<Arg1, Arg2, Payload>
-): Routine<ActionFunction2<Arg1, Arg2, RoutineAction<Payload>>>;
+): Routine<ActionFunction2<Arg1, Arg2, Action<Payload>>>;
 
 export function createRoutine<Payload, Arg1, Arg2, Arg3>(
     typePrefix: string,
     payloadCreator: ActionFunction3<Arg1, Arg2, Arg3, Payload>
-): Routine<ActionFunction3<Arg1, Arg2, Arg3, RoutineAction<Payload>>>;
+): Routine<ActionFunction3<Arg1, Arg2, Arg3, Action<Payload>>>;
 
 export function createRoutine<Payload, Arg1, Arg2, Arg3, Arg4>(
     typePrefix: string,
     payloadCreator: ActionFunction4<Arg1, Arg2, Arg3, Arg4, Payload>
-): Routine<ActionFunction4<Arg1, Arg2, Arg3, Arg4, RoutineAction<Payload>>>;
+): Routine<ActionFunction4<Arg1, Arg2, Arg3, Arg4, Action<Payload>>>;
 
 export function createRoutine<Payload>(
     typePrefix: string
-): Routine<ActionFunction1<Payload, RoutineAction<Payload>>>;
+): Routine<ActionFunction1<Payload, Action<Payload>>>;
+
+export function createRoutine<Meta>(
+    typePrefix: string,
+    payloadCreator: null | undefined,
+    metaCreator: ActionFunctionAny<Meta>
+): Routine<ActionFunctionAny<ActionMeta<any, Meta>>>;
 
 export function createRoutine<Payload, Meta>(
     typePrefix: string,
