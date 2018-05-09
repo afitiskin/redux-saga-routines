@@ -90,6 +90,17 @@ export function createRoutine<Payload, Meta, Arg1, Arg2, Arg3, Arg4>(
     metaCreator: ActionFunction4<Arg1, Arg2, Arg3, Arg4, Meta>
 ): Routine<ActionFunction4<Arg1, Arg2, Arg3, Arg4, ActionMeta<Payload, Meta>>>;
 
-export function bindRoutineToReduxForm<T>(routine: Routine<T>): FormSubmitHandler;
+export interface ReduxFormPayload<FormData = {}, P = {}> {
+    values: FormData
+    props: P
+}
+
+export function bindRoutineToReduxForm<Payload extends ReduxFormPayload<FormData, P>>(
+    routine: Routine<ActionFunction1<Payload, Action<Payload>>>
+): FormSubmitHandler<FormData, P>;
+
+export function bindRoutineToReduxForm<Payload extends ReduxFormPayload<FormData, P>, Meta>(
+    routine: Routine<ActionFunction1<Payload, ActionMeta<Payload, Meta>>>
+): FormSubmitHandler<FormData, P>;
 
 export const ROUTINE_PROMISE_ACTION: string;
