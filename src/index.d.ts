@@ -95,11 +95,11 @@ export interface ReduxFormPayload<FormData = {}, P = {}> {
     props: P
 }
 
-export function bindRoutineToReduxForm<Payload extends ReduxFormPayload<FormData, P>, FormData, P>(
+export function bindRoutineToReduxForm<Payload extends ReduxFormPayload<FormData, P>>(
     routine: Routine<ActionFunction1<Payload, Action<Payload>>>
 ): FormSubmitHandler<FormData, P>;
 
-export function bindRoutineToReduxForm<Payload extends ReduxFormPayload<FormData, P>, Meta, FormData, P>(
+export function bindRoutineToReduxForm<Payload extends ReduxFormPayload<FormData, P>, Meta>(
     routine: Routine<ActionFunction1<Payload, ActionMeta<Payload, Meta>>>
 ): FormSubmitHandler<FormData, P>;
 
