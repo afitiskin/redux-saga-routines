@@ -1,9 +1,10 @@
 {
   "parser": "babel-eslint",
   "plugins": [],
-  "ecmaFeatures": {
-    "jsx": true,
-    "objectLiteralShorthandMethods": true
+  "parserOptions": {
+    "ecmaFeatures": {
+      "objectLiteralShorthandMethods": true
+    }
   },
   "env": {
     "browser": true,
