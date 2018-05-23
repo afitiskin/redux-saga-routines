@@ -25,7 +25,7 @@ export function* handleRoutinePromiseAction(action) {
   ]);
 
   if (success) {
-    yield reduxFormCompatible ? call(resolve) : call(resolve, getPayload(success));
+    yield call(resolve, getPayload(success));
   } else {
     yield call(reject, getPayload(failure));
   }
