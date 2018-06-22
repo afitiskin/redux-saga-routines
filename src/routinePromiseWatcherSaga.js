@@ -8,7 +8,7 @@ export function* handleRoutinePromiseAction(action) {
     payload,
     meta: {
       routine,
-      reduxFormCompatible,
+      noSuccessPayload,
       defer: {
         resolve,
         reject,
@@ -25,7 +25,7 @@ export function* handleRoutinePromiseAction(action) {
   ]);
 
   if (success) {
-    yield reduxFormCompatible ? call(resolve) : call(resolve, getPayload(success));
+    yield noSuccessPayload ? call(resolve) : call(resolve, getPayload(success));
   } else {
     yield call(reject, getPayload(failure));
   }

@@ -21,7 +21,7 @@ describe('routinePromiseWatcherSaga', () => {
 describe('handleRoutinePromiseAction saga', () => {
   const routine = createRoutine('A');
   const handler = promisifyRoutine(routine);
-  const rfHandler = bindRoutineToReduxForm(routine);
+  const rfHandler = bindRoutineToReduxForm(routine, true);
 
   const payload = {
     a: 4,
@@ -43,7 +43,7 @@ describe('handleRoutinePromiseAction saga', () => {
   let reject;
   let run;
 
-  const getRunner = (triggerPayload, reduxFormCompatible) => (winner) => {
+  const getRunner = (triggerPayload, noSuccessPayload) => (winner) => {
     // check if race between SUCCESS and FAILURE started
     // check if request action raised
     expect(iterator.next().value).to.deep.equal(all([
@@ -54,7 +54,7 @@ describe('handleRoutinePromiseAction saga', () => {
     const getWinnerPayload = (data) => (data && data.payload) || data;
     let result;
     if (winner.success) {
-      result = reduxFormCompatible ? call(resolve) : call(resolve, getWinnerPayload(winner.success));
+      result = noSuccessPayload ? call(resolve) : call(resolve, getWinnerPayload(winner.success));
     } else {
       result = call(reject, getWinnerPayload(winner.failure));
     }
@@ -92,7 +92,7 @@ describe('handleRoutinePromiseAction saga', () => {
     });
   });
 
-  describe('redux-form compatible version', () => {
+  describe('redux-form old version compatible version', () => {
     beforeEach(() => {
       run = getRunner({ values, props }, true);
       rfHandler(values, (action) => {
