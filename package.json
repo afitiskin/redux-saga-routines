@@ -1,6 +1,6 @@
 {
   "name": "redux-saga-routines",
-  "version": "3.1.2",
+  "version": "3.1.3",
   "description": "Routines for redux-saga also useful with redux-form",
   "keywords": [
     "redux",
@@ -31,6 +31,7 @@
     "sinon": "^5.0.7"
   },
   "peerDependencies": {
+    "@babel/runtime":  ">=7.0.0",
     "redux-saga": ">=0.15.0"
   },
   "repository": {
