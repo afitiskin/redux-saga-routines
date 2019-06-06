@@ -4,6 +4,7 @@ import createRoutine from './createRoutine';
 import promisifyRoutine from './promisifyRoutine';
 import bindPromiseCreators from './bindPromiseCreators';
 import { ROUTINE_PROMISE_ACTION } from './constants';
+import extendRoutine from './extendRoutine';
 
 export {
   routinePromiseWatcherSaga,
@@ -12,4 +13,5 @@ export {
   promisifyRoutine,
   bindPromiseCreators,
   ROUTINE_PROMISE_ACTION,
+  extendRoutine,
 };
