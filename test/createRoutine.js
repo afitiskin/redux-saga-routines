@@ -263,5 +263,6 @@ describe('createRoutine', () => {
     expect(routine.FULFILL).to.equal(FULFILL);
     expect(routine.fulfill.toString()).to.equal(FULFILL);
     expect(routine.fulfill(payload)).to.deep.equal(fulfillAction);
+
   });
 });
