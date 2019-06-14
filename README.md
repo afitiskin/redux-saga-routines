@@ -67,7 +67,7 @@ projects.TOGGLE_INFO === 'projects/TOGGLE_INFO'
 projects.toggleInfo({ id: 112 }) === { type: "projects/TOGGLE_INFO", payload: { id: 112 } }
 
 const other = extendRoutine(
-  projects
+  createRoutine('other')
   ['SOME_OTHER', 'CUSTOM']
 );
 
