@@ -100,7 +100,7 @@ describe('extendRoutine', () => {
 
   it('should create extened routine if types arg is string', () => {
 
-    const routine = extendRoutine(createRoutine(PREFIX), ['SOME_LONG_TYPE']);
+    const routine = extendRoutine(createRoutine(PREFIX), 'SOME_LONG_TYPE');
 
     expect(routine.someLongType).to.be.a('function');
     expect(routine.SOME_LONG_TYPE).to.equal(SOME);
