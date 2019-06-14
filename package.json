@@ -1,6 +1,6 @@
 {
   "name": "redux-saga-routines",
-  "version": "3.1.3",
+  "version": "3.1.4",
   "description": "Routines for redux-saga also useful with redux-form",
   "keywords": [
     "redux",
@@ -31,7 +31,7 @@
     "sinon": "^5.0.7"
   },
   "peerDependencies": {
-    "@babel/runtime":  ">=7.0.0",
+    "@babel/runtime": ">=7.0.0",
     "redux-saga": ">=0.15.0"
   },
   "repository": {
@@ -54,6 +54,10 @@
     {
       "name": "Karol Janyst",
       "email": "lapkom@gmail.com"
+    },
+    {
+      "name": "Yury Shapkarin",
+      "email": "yury@shapkarin.me"
     }
   ],
   "maintainers": [
