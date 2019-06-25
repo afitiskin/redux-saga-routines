@@ -361,7 +361,7 @@ You are also allowed to use combo of `redux-saga`, `redux-form` and `redux-saga-
 Since `redux-form` validation based on promises, you are able to handle `redux-form` validation in your saga.
 To achive this just add `routinePromiseWatcherSaga` in your `sagaMiddleware.run()`, like in example above.
 
-There are special `bindRoutineToReduxForm` helper, that wraps your routine in function with `redux-form` compatible signature: `(values, dispatch, props) => Promise` (it works just like `promisifyRoutine` but more specific to be compatible with full `redux-form` functionality)
+There is a special `bindRoutineToReduxForm` helper, that wraps your routine in function with `redux-form` compatible signature: `(values, dispatch, props) => Promise` (it works just like `promisifyRoutine` but more specific to be compatible with full `redux-form` functionality)
 
 
 First, create routine and it's wrapper for `redux-form`:
