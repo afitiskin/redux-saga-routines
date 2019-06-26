@@ -218,7 +218,7 @@ const sagas = [
   // ...,
   routinePromiseWatcherSaga,
 ];
-sagas.forEach(sagaMiddleware.run);
+sagas.forEach((saga) => sagaMiddleware.run(saga));
 ```
 
 Now we are ready. There is special `promisifyRoutine` helper, that wraps your routine in function with signature: `(payload, dispatch) => Promise`.
