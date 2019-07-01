@@ -56,6 +56,59 @@ expect(routine(payload)).to.deep.equal(routine.trigger(payload));
 `redux-saga-routines` based on [redux-actions](https://github.com/reduxactions/redux-actions), so `createRoutine` actually accepts 3 parameters: `(actionTypePrefix, payloadCreator, metaCreator) => function`.
 Every routine action creator is a  `redux-actions` FSA, so you can use them with `handleAction(s)` or `combineActions` from `redux-actions`
 
+You can also create routie with default stages and yours custom with `createExtendedRoutine`. All stages will be cameCased. Example:
+
+```javascript
+import { createExtendedRoutine } from 'redux-saga-routines';
+
+const projects = createExtendedRoutine('projects', 'TOGGLE');
+
+projects.TOGGLE === 'projects/TOGGLE';
+console.log(other.close({ id: 42 })) // { type: "projects/TOGGLE", payload: { id: 42 } }
+```
+
+You can pass an array:
+```javascript
+import { createExtendedRoutine } from 'redux-saga-routines';
+
+const other = createExtendedRoutine('other', ['OPEN', 'CLOSE']);
+
+other.OPEN === 'other/OPEN';
+console.log(other.open(42)); // { type: "other/OPEN", payload: 42 }
+
+other.CLOSE === 'other/CLOSE';
+console.log(other.close(42)) // { type: "other/CLOSE", payload: 42 }
+```
+
+And also you can add cusom payload and meta creators with the same API as `createRoutine`:
+```javascript
+import { createExtendedRoutine } from 'redux-saga-routines';
+
+const customPayloadMeta = createExtendedRoutine('payload/meta', 'MILTIPLIED_PAYLOAD',
+  { multipliedPayload: (payload) => payload * 2 },
+  { multipliedPayload: () => { some: 'meta' } }
+);
+
+console.log(customPayloadMeta.multipliedPayload(2)) // { type: "payload/meta/MILTIPLIED_PAYLOAD", payload: 4, meta: { some: "meta" }};
+```
+
+If ypu don't need default routine stages you can use `createCustomRoutine`:
+```javascript
+import { createCustomRoutine } from 'redux-saga-routines';
+
+const steps = createCustomRoutine('steps', ['NEXT', 'PREVIOUS', 'GO_TO']);
+
+steps.NEXT === 'steps/NEXT';
+console.log(steps.next()); // { type: "steps/NEXT" }
+
+steps.PREVIOUS === 'steps/PREVIOUS';
+console.log(steps.previous()); // { type: "steps/PREVIOUS" }
+
+steps.TO === 'steps/GO_TO';
+console.log(steps.goTo(3)); // { type: "steps/GO_TO", payload: 3 }
+```
+
+Also you can add yours custom payload and meta creators to `createCustomRoutine` in the same way as in `createExtendedRoutine` example.
 
 ## Usage
 ### Example: fetching data from server
@@ -441,62 +494,6 @@ function* sendFormDataToServer(formData) {
   }
 }
 ```
-
-// TODO: find palce for that part of docs
-// TODO: don't forget write about camelCase
-
-### You can also create routie with default stages and yours custom with `createExtendedRoutine`:
-```javascript
-import { createExtendedRoutine } from 'redux-saga-routines';
-
-const projects = createExtendedRoutine('projects', 'TOGGLE');
-
-projects.TOGGLE === 'projects/TOGGLE';
-console.log(other.close({ id: 42 })) // { type: "projects/TOGGLE", payload: { id: 42 } }
-```
-
-You can pass an array:
-```javascript
-import { createExtendedRoutine } from 'redux-saga-routines';
-
-const other = createExtendedRoutine('other', ['OPEN', 'CLOSE']);
-
-other.OPEN === 'other/OPEN';
-console.log(other.open(42)); // { type: "other/OPEN", payload: 42 }
-
-other.CLOSE === 'other/CLOSE';
-console.log(other.close(42)) // { type: "other/CLOSE", payload: 42 }
-```
-
-And also you can add cusom payload and meta creators with the same API as `createRoutine`:
-```javascript
-import { createExtendedRoutine } from 'redux-saga-routines';
-
-const customPayloadMeta = createExtendedRoutine('payload/meta', 'MILTIPLIED_PAYLOAD',
-  { multipliedPayload: (payload) => payload * 2 },
-  { multipliedPayload: () => { some: 'meta' } }
-);
-
-console.log(customPayloadMeta.multipliedPayload(2)) // { type: "payload/meta/MILTIPLIED_PAYLOAD", payload: 4, meta: { some: "meta" }};
-```
-
-### If ypu don't need default routine stages you can use `createCustomRoutine`:
-```javascript
-import { createCustomRoutine } from 'redux-saga-routines';
-
-const steps = createCustomRoutine('steps', ['NEXT', 'PREVIOUS', 'GO_TO']);
-
-steps.NEXT === 'steps/NEXT';
-console.log(steps.next()); // { type: "steps/NEXT" }
-
-steps.PREVIOUS === 'steps/PREVIOUS';
-console.log(steps.previous()); // { type: "steps/PREVIOUS" }
-
-steps.TO === 'steps/GO_TO';
-console.log(steps.goTo(3)); // { type: "steps/GO_TO", payload: 3 }
-```
-
-Also you can add yours custom payload and meta creators to `createCustomRoutine` in the same way as in `createExtendedRoutine` example.
 
 ## License
 
