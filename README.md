@@ -64,7 +64,8 @@ import { createExtendedRoutine } from 'redux-saga-routines';
 const projects = createExtendedRoutine('projects', 'TOGGLE');
 
 projects.TOGGLE === 'projects/TOGGLE';
-console.log(other.close({ id: 42 })) // { type: "projects/TOGGLE", payload: { id: 42 } }
+console.log(other.close({ id: 42 }))
+// { type: "projects/TOGGLE", payload: { id: 42 } }
 ```
 
 You can pass an array:
@@ -89,7 +90,8 @@ const customPayloadMeta = createExtendedRoutine('payload/meta', 'MILTIPLIED_PAYL
   { multipliedPayload: () => { some: 'meta' } }
 );
 
-console.log(customPayloadMeta.multipliedPayload(2)) // { type: "payload/meta/MILTIPLIED_PAYLOAD", payload: 4, meta: { some: "meta" }};
+console.log(customPayloadMeta.multipliedPayload(2))
+// { type: "payload/meta/MILTIPLIED_PAYLOAD", payload: 4, meta: { some: "meta" }};
 ```
 
 If ypu don't need default routine stages you can use `createCustomRoutine`:
