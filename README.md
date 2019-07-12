@@ -56,6 +56,62 @@ expect(routine(payload)).to.deep.equal(routine.trigger(payload));
 `redux-saga-routines` based on [redux-actions](https://github.com/reduxactions/redux-actions), so `createRoutine` actually accepts 3 parameters: `(actionTypePrefix, payloadCreator, metaCreator) => function`.
 Every routine action creator is a  `redux-actions` FSA, so you can use them with `handleAction(s)` or `combineActions` from `redux-actions`
 
+You can also create routie with default stages and yours custom with `createExtendedRoutine`. All stages will be cameCased. Example:
+
+```javascript
+import { createExtendedRoutine } from 'redux-saga-routines';
+
+const projects = createExtendedRoutine('projects', 'TOGGLE');
+
+projects.TOGGLE === 'projects/TOGGLE';
+console.log(other.close({ id: 42 }))
+// { type: "projects/TOGGLE", payload: { id: 42 } }
+```
+
+You can pass an array:
+```javascript
+import { createExtendedRoutine } from 'redux-saga-routines';
+
+const other = createExtendedRoutine('other', ['OPEN', 'CLOSE']);
+
+other.OPEN === 'other/OPEN';
+console.log(other.open(42)); // { type: "other/OPEN", payload: 42 }
+
+other.CLOSE === 'other/CLOSE';
+console.log(other.close(42)) // { type: "other/CLOSE", payload: 42 }
+```
+
+And also you can add cusom payload and meta creators with the same API as `createRoutine`:
+```javascript
+import { createExtendedRoutine } from 'redux-saga-routines';
+
+const customPayloadMeta = createExtendedRoutine('payload/meta', 'MILTIPLIED_PAYLOAD',
+  { multipliedPayload: (payload) => payload * 2 },
+  { multipliedPayload: () => { some: 'meta' } }
+);
+
+console.log(customPayloadMeta.multipliedPayload(2))
+// { type: "payload/meta/MILTIPLIED_PAYLOAD", payload: 4, meta: { some: "meta" }};
+```
+
+If ypu don't need default routine stages you can use `createCustomRoutine`:
+```javascript
+import { createCustomRoutine } from 'redux-saga-routines';
+
+const steps = createCustomRoutine('steps', ['NEXT', 'PREVIOUS', 'GO_TO']);
+
+steps.NEXT === 'steps/NEXT';
+console.log(steps.next()); // { type: "steps/NEXT" }
+
+steps.PREVIOUS === 'steps/PREVIOUS';
+console.log(steps.previous()); // { type: "steps/PREVIOUS" }
+
+steps.TO === 'steps/GO_TO';
+console.log(steps.goTo(3)); // { type: "steps/GO_TO", payload: 3 }
+```
+
+Also you can add yours custom payload and meta creators to `createCustomRoutine` in the same way as in `createExtendedRoutine` example.
+
 ## Usage
 ### Example: fetching data from server
 
@@ -245,21 +301,21 @@ class MyComponent extends React.Component {
   static mapStateToProps(state) {
     // return props object from selected from state
   }
-  
+
   static mapDispatchToProps(dispatch) {
     return {
-      ...bindPromiseCreators({ 
+      ...bindPromiseCreators({
         myRoutinePromiseCreator,
-        // other promise creators can be here... 
+        // other promise creators can be here...
       }, dispatch),
-      
+
       // here you can use bindActionCreators from redux
       // to bind simple action creators
       // ...bindActionCreators({ mySimpleAction1, mySimpleAction2 }, dispatch)
-      
+
       // or other helpers to bind other functions to store's dispatch
       // ...
-      
+
       // or just pass dispatch as a prop to component
       dispatch,
     };
@@ -270,36 +326,36 @@ class MyComponent extends React.Component {
     const promise = this.props.myRoutinePromiseCreator(somePayload);
     // so, call of myRoutinePromiseCreator returns promise
     // you can use this promise as you want
-    
+
     promise.then(
       (successPayload) => console.log('success :)', successPayload),
       (failurePayload) => console.log('failure :(', failurePayload),
     );
-    
-    
+
+
     // internally when you call myRoutinePromiseCreator() special action with type ROUTINE_PROMISE_ACTION is dispatched
     // this special action is handled by routinePromiseWatcherSaga
-    
+
     // to resolve promise you need to dispatch myRoutine.success(successPayload) action, successPayload will be passed to resolved promise
     // if  myRoutine.failure(failurePayload) is dispatched, promise will be rejected with failurePayload.
-    
+
     // we just want to wait 5 seconds and then resolve promise with 'voila!' message:
     setTimeout(
       () => this.props.dispatch(myRoutine.success('voila!')),
       5000,
     );
-    
+
     // same example, but with promise rejection:
     // setTimeout(
     //   () => this.props.dispatch(myRoutine.failure('something went wrong...')),
     //   5000,
     // );
-    
+
     // of course you don't have to do it in your component
     // you can do it in your saga
     // see below
   }
-  
+
   render() {
     return (
       <button onClick={() => this.handleClick()}>
@@ -318,7 +374,7 @@ You are able to resolve/reject given promise in your saga:
 import { myRoutine } from './routines';
 
 function* myRoutineTriggerWatcher() {
-  // when you call myRoutinePromiseCreator(somePayload) 
+  // when you call myRoutinePromiseCreator(somePayload)
   // internally myRoutine.trigger(somePayload) action is dispatched
   // we take every routine trigger actions and handle them
   yield takeEvery(myRoutine.TRIGGER, handleTriggerAction)
@@ -440,7 +496,6 @@ function* sendFormDataToServer(formData) {
   }
 }
 ```
-
 
 ## License
 
