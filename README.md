@@ -2,22 +2,26 @@
 A smart action creator for [Redux](https://github.com/reactjs/redux). Useful for any kind of async actions like fetching data.
 Also fully compatible with [Redux Saga](https://github.com/yelouafi/redux-saga) and [Redux Form](https://github.com/erikras/redux-form).
 
-## Version 2
-Module was totally reworked since version 2.0.0. If you still using version 1.* see [version 1 docs](https://github.com/afitiskin/redux-saga-routines/tree/v1)
-
 ## Why do I need this?
 
 Reduce boilerplate from your source code when making requests to API or validating forms build on top of [Redux Form](https://github.com/erikras/redux-form).
 
 ## Installation
 
-```javascript
+```shell
 yarn add redux-saga-routines
+```
+
+or
+
+```shell
+npm install --save redux-saga-routines
 ```
 
 ## What is routine?
 Routine is a smart action creator that encapsulates 5 action types and 5 action creators to make standard actions lifecycle easy-to-use:
-TRIGGER -> REQUEST -> SUCCESS / FAILURE -> FULFILL
+
+`TRIGGER` -> `REQUEST` -> `SUCCESS` / `FAILURE` -> `FULFILL`
 
 So, with `redux-saga-routines` you don't need to create all these action type constants and action creators manually, just use `createRoutine`:
 
@@ -32,87 +36,215 @@ const routine = createRoutine('ACTION_TYPE_PREFIX');
 
 You can access all action types using `TRIGGER`, `REQUEST`, `SUCCESS`, `FAILURE`, `FULFILL` attributes of `routine` object:
 ```javascript
-routine.TRIGGER === 'ACTION_TYPE_PREFIX/TRIGGER';
-routine.REQUEST === 'ACTION_TYPE_PREFIX/REQUEST';
-routine.SUCCESS === 'ACTION_TYPE_PREFIX/SUCCESS';
-routine.FAILURE === 'ACTION_TYPE_PREFIX/FAILURE';
-routine.FULFILL === 'ACTION_TYPE_PREFIX/FULFILL';
+console.log(routine.TRIGGER); 
+// 'ACTION_TYPE_PREFIX/TRIGGER';
+
+console.log(routine.REQUEST); 
+// 'ACTION_TYPE_PREFIX/REQUEST';
+
+console.log(routine.SUCCESS); 
+// 'ACTION_TYPE_PREFIX/SUCCESS';
+
+console.log(routine.FAILURE); 
+// 'ACTION_TYPE_PREFIX/FAILURE';
+
+console.log(routine.FULFILL); 
+// 'ACTION_TYPE_PREFIX/FULFILL';
 ```
 
 You also have 5 action creators: `trigger`, `request`, `success`, `failure`, `fulfill`:
 ```javascript
-routine.trigger(payload) === { type: 'ACTION_TYPE_PREFIX/TRIGGER', payload };
-routine.request(payload) === { type: 'ACTION_TYPE_PREFIX/REQUEST', payload };
-routine.success(payload) === { type: 'ACTION_TYPE_PREFIX/SUCCESS', payload };
-routine.failure(payload) === { type: 'ACTION_TYPE_PREFIX/FAILURE', payload };
-routine.fulfill(payload) === { type: 'ACTION_TYPE_PREFIX/FULFILL', payload };
+console.log(routine.trigger(payload)); 
+// { type: 'ACTION_TYPE_PREFIX/TRIGGER', payload };
+
+console.log(routine.request(payload)); 
+// { type: 'ACTION_TYPE_PREFIX/REQUEST', payload };
+
+console.log(routine.success(payload)); 
+// { type: 'ACTION_TYPE_PREFIX/SUCCESS', payload };
+
+console.log(routine.failure(payload)); 
+// { type: 'ACTION_TYPE_PREFIX/FAILURE', payload };
+
+console.log(routine.fulfill(payload)); 
+// { type: 'ACTION_TYPE_PREFIX/FULFILL', payload };
 ```
 
 Routine by itself is a trigger action creator function:
 ```javascript
-expect(routine(payload)).to.deep.equal(routine.trigger(payload));
+// following calls will give you the same result
+console.log(routine(payload)); // { type: 'ACTION_TYPE_PREFIX/TRIGGER', payload };
+console.log(routine.trigger(payload)); // { type: 'ACTION_TYPE_PREFIX/TRIGGER', payload };
 ```
 
+Every routine's action creator is a [Flux Standard Action](https://github.com/redux-utilities/flux-standard-action)
+
+## Payload and meta creators for routines
 `redux-saga-routines` based on [redux-actions](https://github.com/reduxactions/redux-actions), so `createRoutine` actually accepts 3 parameters: `(actionTypePrefix, payloadCreator, metaCreator) => function`.
-Every routine action creator is a  `redux-actions` FSA, so you can use them with `handleAction(s)` or `combineActions` from `redux-actions`
 
-You can also create routie with default stages and yours custom with `createExtendedRoutine`. All stages will be cameCased. Example:
+### Changing action payload with `payloadCreator`
+
+You may pass a function as a second argument to `createRoutine` and it will be used as a payload creator:
 
 ```javascript
-import { createExtendedRoutine } from 'redux-saga-routines';
+const routine = createRoutine('PREFIX', (value) => value * 2);
 
-const projects = createExtendedRoutine('projects', 'TOGGLE');
+console.log(routine.trigger(1)); 
+// { type: 'PREFIX/TRIGGER', payload: 2 }
 
-projects.TOGGLE === 'projects/TOGGLE';
-console.log(other.close({ id: 42 }))
-// { type: "projects/TOGGLE", payload: { id: 42 } }
-```
+console.log(routine.request(2)); 
+// { type: 'PREFIX/TRIGGER', payload: 4 }
 
-You can pass an array:
+console.log(routine.success(3)); 
+// { type: 'PREFIX/TRIGGER', payload: 6 }
+
+console.log(routine.failure(4)); 
+// { type: 'PREFIX/TRIGGER', payload: 8 }
+
+console.log(routine.fulfill(5));
+// { type: 'PREFIX/TRIGGER', payload: 10 }
+````
+
+You may also pass object as a second argument to define unique payload creator for each action:
+
 ```javascript
-import { createExtendedRoutine } from 'redux-saga-routines';
+const payloadCreator = {
+  trigger: (payload) => ({ ...payload, trigger: true }), // we may use payload creator to extend payload
+  request: ({ id }) => ({ id }), // or to filter its values
+  success: (payload) => ({ ...payload, data: parseData(payload.data) }), // or to change payload on the fly 
+  failure: (payload) => ({ errorMessage: parseError(payload.error), error: true }), // or to do all of these at once
+  fulfill: () => ({}), // or to completely change/remove payload ...
+};
 
-const other = createExtendedRoutine('other', ['OPEN', 'CLOSE']);
+const routine = createRoutine('PREFIX', payloadCreator); // passing object as a second parameter
 
-other.OPEN === 'other/OPEN';
-console.log(other.open(42)); // { type: "other/OPEN", payload: 42 }
+console.log(routine.trigger({ id: 42 })); 
+// { type: 'PREFIX/TRIGGER', payload: { id: 42, trigger: true } }
 
-other.CLOSE === 'other/CLOSE';
-console.log(other.close(42)) // { type: "other/CLOSE", payload: 42 }
+console.log(routine.request({ id: 42, foo: 'bar' })); 
+// { type: 'PREFIX/TRIGGER', payload: { id: 42 } }
+
+console.log(routine.success({ id: 42, data: 'something' })); 
+// { type: 'PREFIX/TRIGGER', payload: { id: 42, data: parseData('something') } }
+
+console.log(routine.failure({ id: 42, error: 'oops...' })); 
+// { type: 'PREFIX/TRIGGER', payload: { error: true, errorMessage: parseError('oops..') } }
+
+console.log(routine.fulfill({ id: 42, foo: 'bar', baz: 'zab' })); 
+// { type: 'PREFIX/TRIGGER', payload: {}} }
 ```
 
-And also you can add cusom payload and meta creators with the same API as `createRoutine`:
+You may use lower or uppercase for `payloadCreator`-object keys: 
+
 ```javascript
-import { createExtendedRoutine } from 'redux-saga-routines';
-
-const customPayloadMeta = createExtendedRoutine('payload/meta', 'MILTIPLIED_PAYLOAD',
-  { multipliedPayload: (payload) => payload * 2 },
-  { multipliedPayload: () => { some: 'meta' } }
-);
-
-console.log(customPayloadMeta.multipliedPayload(2))
-// { type: "payload/meta/MILTIPLIED_PAYLOAD", payload: 4, meta: { some: "meta" }};
+const payloadCreator = {
+  trigger: () => {}, // lowercase is okay
+  REQUEST: () => {}, // uppercase is okay as well
+};
 ```
 
-If ypu don't need default routine stages you can use `createCustomRoutine`:
+### Adding or changing action meta with `metaCreator`
+`createRoutine` accept third parameter and treat it as `metaCreator`. It works almost the same as `payloadCreator` (function or object is accepted) 
+the only difference is it works with `action.meta` instead of `action.payload` parameter:
+
 ```javascript
-import { createCustomRoutine } from 'redux-saga-routines';
+const simpleMetaCreator = () => ({ foo: 'bar' });
+const routineWithSimpleMeta = createRoutine('PREFIX', null, simpleMetaCreator);
 
-const steps = createCustomRoutine('steps', ['NEXT', 'PREVIOUS', 'GO_TO']);
+console.log(routineWithSimpleMeta.trigger()); 
+// { type: 'PREFIX/TRIGGER', payload: {}, meta: { foo: 'bar' } }
 
-steps.NEXT === 'steps/NEXT';
-console.log(steps.next()); // { type: "steps/NEXT" }
+const complexMetaCreator = {
+  trigger: () => ({ trigger: true }),
+  request: () => ({ ignoreCache: true }),
+  success: () => ({ saveToCache: true }),
+  failure: () => ({ logSomewhere: true }),
+  fulfill: () => ({ yo: 'bro!' }),
+};
 
-steps.PREVIOUS === 'steps/PREVIOUS';
-console.log(steps.previous()); // { type: "steps/PREVIOUS" }
+const routineWithComplexMeta =  createRoutine('PREFIX', null, complexMetaCreator);
+console.log(routineWithSimpleMeta.trigger()); 
+// { type: 'PREFIX/TRIGGER', payload: {}, meta: { trigger: true } }
 
-steps.TO === 'steps/GO_TO';
-console.log(steps.goTo(3)); // { type: "steps/GO_TO", payload: 3 }
+console.log(routineWithSimpleMeta.request()); 
+// { type: 'PREFIX/TRIGGER', payload: {}, meta: { ignoreCache: true } }
+
+console.log(routineWithSimpleMeta.success()); 
+// { type: 'PREFIX/TRIGGER', payload: {}, meta: { saveToCache: true } }
+
+console.log(routineWithSimpleMeta.failure()); 
+// { type: 'PREFIX/TRIGGER', payload: {}, meta: { logSomewhere: true } }
+
+console.log(routineWithSimpleMeta.fulfill()); 
+// { type: 'PREFIX/TRIGGER', payload: {}, meta: { yo: 'bro!' } }
 ```
 
-Also you can add yours custom payload and meta creators to `createCustomRoutine` in the same way as in `createExtendedRoutine` example.
+## Creating your own routines
+Sometimes you may need custom routines, so now you are able to create your own routine creator to get them!
 
-## Usage
+```javascript
+import { createRoutineCreator } from 'redux-saga-routines';
+
+const createToggleRoutine = createRoutineCreator(['SHOW', 'HIDE', 'TOGGLE']);
+console.log(createToggleRoutine.STAGES);
+// ['SHOW', 'HIDE', 'TOGGLE']
+
+const myToggler = createToggleRoutine('PREFIX'/*, payloadCreator, metaCreator*/);
+console.log(myToggler._STAGES);
+// ['SHOW', 'HIDE', 'TOGGLE']
+
+console.log(myToggler._PREFIX);
+// 'PREFIX'
+
+console.log(myToggler.SHOW);
+// 'PREFIX/SHOW'
+
+console.log(myToggler.HIDE);
+// 'PREFIX/HIDE'
+
+console.log(myToggler.TOGGLE);
+// 'PREFIX/TOGGLE'
+
+console.log(myToggler.show(payload));
+// { type: 'PREFIX/SHOW', payload }
+
+console.log(myToggler.hide(payload));
+// { type: 'PREFIX/HIDE', payload }
+
+console.log(myToggler.toggle(payload));
+// { type: 'PREFIX/TOGGLE', payload } 
+```
+
+So, now you are able to group any actions into custom routine and use it as you want!
+
+`createRoutineCreator` also accepts custom separator as a second parameter, so you are able to change slash `/` with anything you want:
+
+```javascript
+import { createRoutineCreator, routineStages } from 'redux-saga-routines';
+
+const createUnderscoreRoutine = createRoutineCreator(routineStages, '_');
+const routine = createUnderscoreRoutine('ACTION_TYPE_PREFIX');
+
+console.log(routine.TRIGGER); 
+// 'ACTION_TYPE_PREFIX_TRIGGER';
+
+console.log(routine.REQUEST); 
+// 'ACTION_TYPE_PREFIX_REQUEST';
+
+console.log(routine.SUCCESS); 
+// 'ACTION_TYPE_PREFIX_SUCCESS';
+
+console.log(routine.FAILURE); 
+// 'ACTION_TYPE_PREFIX_FAILURE';
+
+console.log(routine.FULFILL); 
+// 'ACTION_TYPE_PREFIX_FULFILL';
+```
+
+In example above you may notice, that default routine stages are also exported from the package, so you may use them to create your own extended routine.
+Now all the power is in your hands, use it as you want!
+
+## Usage examples
 ### Example: fetching data from server
 
 Let's start with creating routine for fetching some data from server:
@@ -496,6 +628,9 @@ function* sendFormDataToServer(formData) {
   }
 }
 ```
+
+## Version 2
+Module was totally reworked since version 2.0.0. If you still using version 1.* see [version 1 docs](https://github.com/afitiskin/redux-saga-routines/tree/v1)
 
 ## License
 

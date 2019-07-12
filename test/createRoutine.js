@@ -1,6 +1,7 @@
 import { describe, it } from 'mocha';
 import { expect } from 'chai';
 
+import routineStages from '../src/routineStages';
 import createRoutine from '../src/createRoutine';
 
 const PREFIX = 'PREFIX';
@@ -13,6 +14,14 @@ const FULFILL = `${PREFIX}/FULFILL`;
 describe('createRoutine', () => {
   it('should be a function', () => {
     expect(createRoutine).to.be.a('function');
+  });
+
+  it('should throw an error if type prefix is not defined', () => {
+    expect(() => createRoutine()).to.throw();
+  });
+
+  it('should expose default routine stages', () => {
+    expect(createRoutine.STAGES).to.eq(routineStages);
   });
 
   it('should create new routine', () => {
@@ -45,6 +54,9 @@ describe('createRoutine', () => {
     expect(routine).to.be.a('function');
     expect(routine.toString()).to.equal(TRIGGER);
     expect(routine(payload)).to.deep.equal(triggerAction);
+
+    expect(routine._STAGES).to.eq(routineStages);
+    expect(routine._PREFIX).to.equal(PREFIX);
 
     expect(routine.trigger).to.be.a('function');
     expect(routine.TRIGGER).to.equal(TRIGGER);
