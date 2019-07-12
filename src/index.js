@@ -1,15 +1,9 @@
-import routinePromiseWatcherSaga from './routinePromiseWatcherSaga';
-import bindRoutineToReduxForm from './bindRoutineToReduxForm';
-import createRoutine from './createRoutine';
-import promisifyRoutine from './promisifyRoutine';
-import bindPromiseCreators from './bindPromiseCreators';
-import { ROUTINE_PROMISE_ACTION } from './constants';
+export { default as defaultRoutineStages } from './routineStages';
+export { default as createRoutine } from './createRoutine';
+export { default as createRoutineCreator } from './createRoutineCreator';
 
-export {
-  routinePromiseWatcherSaga,
-  bindRoutineToReduxForm,
-  createRoutine,
-  promisifyRoutine,
-  bindPromiseCreators,
-  ROUTINE_PROMISE_ACTION,
-};
+export { default as promisifyRoutine } from './promisifyRoutine';
+export { default as routinePromiseWatcherSaga } from './routinePromiseWatcherSaga';
+export { default as bindRoutineToReduxForm } from './bindRoutineToReduxForm';
+export { default as bindPromiseCreators } from './bindPromiseCreators';
+export { ROUTINE_PROMISE_ACTION } from './constants';
