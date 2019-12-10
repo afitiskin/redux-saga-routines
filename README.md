@@ -220,9 +220,9 @@ So, now you are able to group any actions into custom routine and use it as you 
 `createRoutineCreator` also accepts custom separator as a second parameter, so you are able to change slash `/` with anything you want:
 
 ```javascript
-import { createRoutineCreator, routineStages } from 'redux-saga-routines';
+import { createRoutineCreator, defaultRoutineStages } from 'redux-saga-routines';
 
-const createUnderscoreRoutine = createRoutineCreator(routineStages, '_');
+const createUnderscoreRoutine = createRoutineCreator(defaultRoutineStages, '_');
 const routine = createUnderscoreRoutine('ACTION_TYPE_PREFIX');
 
 console.log(routine.TRIGGER); 
