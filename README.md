@@ -128,10 +128,10 @@ console.log(routine.success({ id: 42, data: 'something' }));
 // { type: 'PREFIX/TRIGGER', payload: { id: 42, data: parseData('something') } }
 
 console.log(routine.failure({ id: 42, error: 'oops...' })); 
-// { type: 'PREFIX/TRIGGER', payload: { error: true, errorMessage: parseError('oops..') } }
+// { type: 'PREFIX/TRIGGER', payload: { id: 42, error: 'oops...' } }
 
 console.log(routine.fulfill({ id: 42, foo: 'bar', baz: 'zab' })); 
-// { type: 'PREFIX/TRIGGER', payload: {}} }
+// { type: 'PREFIX/TRIGGER', payload: { id: 42, foo: 'bar', baz: 'zab' } }
 ```
 
 You may use lower or uppercase for `payloadCreator`-object keys: 
